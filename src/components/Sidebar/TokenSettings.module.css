@@ -1,0 +1,325 @@
+.tokenSettings {
+  color: #cccccc;
+}
+
+/* Toggle label */
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.toggleLabel input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  accent-color: #007acc;
+}
+
+.toggleLabel span {
+  color: #cccccc;
+}
+
+.toggleLabel:hover span {
+  color: #ffffff;
+}
+
+/* Hint text */
+.hint {
+  font-size: 10px;
+  color: #858585;
+  margin: 2px 0 10px 0;
+  line-height: 1.3;
+}
+
+/* Control row - label + input inline */
+.controlRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.controlRow .label {
+  flex-shrink: 0;
+  width: 70px;
+  font-size: 11px;
+  color: #999;
+}
+
+.label {
+  font-size: 11px;
+  color: #999;
+}
+
+/* Select */
+.select {
+  flex: 1;
+  padding: 5px 8px;
+  background: #3c3c3c;
+  border: 1px solid #454545;
+  color: #cccccc;
+  font-size: 11px;
+  font-family: inherit;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  min-width: 0;
+}
+
+.select:hover {
+  background: #404040;
+}
+
+.select:focus {
+  border-color: #007acc;
+}
+
+.select option:disabled {
+  color: #666;
+}
+
+/* Input */
+.input {
+  flex: 1;
+  padding: 5px 8px;
+  background: #3c3c3c;
+  border: 1px solid #454545;
+  color: #cccccc;
+  font-size: 11px;
+  font-family: inherit;
+  border-radius: 3px;
+  outline: none;
+  min-width: 0;
+}
+
+.input:focus {
+  border-color: #007acc;
+}
+
+/* Model info - compact horizontal display */
+.modelInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #858585;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+.separator {
+  color: #454545;
+}
+
+/* Sub-section (collapsible) */
+.subSection {
+  margin-top: 8px;
+  border-top: 1px solid #3e3e42;
+  padding-top: 4px;
+}
+
+.subSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+}
+
+.subSectionHeader:hover {
+  color: #ffffff;
+}
+
+.subSectionHeader svg {
+  flex-shrink: 0;
+}
+
+.subSectionContent {
+  padding: 4px 0 8px 0;
+}
+
+/* Custom models list */
+.customModelList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.customModelItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  background: #2d2d2d;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.modelActions {
+  display: flex;
+  gap: 2px;
+}
+
+.modelActions button {
+  background: none;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.modelActions button:hover {
+  background: #3e3e42;
+  color: #ffffff;
+}
+
+/* Add button */
+.addBtn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px;
+  background: #3e3e42;
+  border: none;
+  border-radius: 3px;
+  color: #cccccc;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.addBtn:hover {
+  background: #4e4e52;
+  color: #ffffff;
+}
+
+/* Threshold row - two inputs side by side */
+.thresholdRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.thresholdItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.thresholdItem label {
+  font-size: 9px;
+  color: #858585;
+  text-transform: uppercase;
+}
+
+.thresholdItem input {
+  padding: 4px 6px;
+  background: #3c3c3c;
+  border: 1px solid #454545;
+  color: #cccccc;
+  font-size: 11px;
+  border-radius: 3px;
+  outline: none;
+  width: 100%;
+}
+
+.thresholdItem input:focus {
+  border-color: #007acc;
+}
+
+/* API Key row */
+.apiKeyRow {
+  margin-bottom: 10px;
+}
+
+.apiKeyRow > label {
+  display: block;
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.keyInputGroup {
+  display: flex;
+  gap: 3px;
+}
+
+.keyInputGroup input {
+  flex: 1;
+  padding: 5px 8px;
+  background: #2d2d2d;
+  border: 1px solid #454545;
+  border-radius: 3px;
+  color: #cccccc;
+  font-size: 11px;
+  font-family: 'Consolas', monospace;
+  min-width: 0;
+}
+
+.keyInputGroup input:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.keyInputGroup button {
+  padding: 5px;
+  background: #2d2d2d;
+  border: 1px solid #454545;
+  border-radius: 3px;
+  color: #858585;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keyInputGroup button:hover:not(:disabled) {
+  background: #3e3e42;
+  color: #ffffff;
+}
+
+.keyInputGroup button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.keyStatus {
+  font-size: 10px;
+  color: #10b981;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+/* Status message */
+.statusMessage {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 3px;
+  font-size: 10px;
+  color: #3b82f6;
+  margin-top: 8px;
+}

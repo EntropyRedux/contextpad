@@ -1,0 +1,83 @@
+.container {
+  height: 100%;
+  overflow-y: auto;
+  color: var(--vscode-fg);
+  font-size: 13px;
+  user-select: none;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #858585;
+}
+
+.emptyState h3 {
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: var(--vscode-fg);
+  font-weight: 500;
+}
+
+.emptyState p {
+  font-size: 12px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.openButton {
+  background: var(--vscode-statusbar-bg);
+  color: var(--vscode-statusbar-fg);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: opacity 0.15s;
+}
+
+.openButton:hover {
+  opacity: 0.9;
+}
+
+.tree {
+  padding: 8px 0;
+}
+
+.folderHeader {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #858585;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.folderPath {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 16px;
+  line-height: 1;
+  margin-left: 8px;
+  border-radius: 3px;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}

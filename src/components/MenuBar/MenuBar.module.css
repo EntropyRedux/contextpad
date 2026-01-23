@@ -1,0 +1,168 @@
+.menuBar {
+  position: relative;
+  display: flex;
+  height: 30px;
+  background: var(--vscode-menu-bg);
+  color: var(--vscode-fg);
+  user-select: none;
+  border-bottom: 1px solid var(--vscode-tab-border);
+}
+
+.dragRegion {
+  flex: 1;
+  height: 100%;
+}
+
+.menuItem {
+  position: relative;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  color: #cccccc;
+  padding: 0 12px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.menuButton:hover,
+.menuButton.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #252526;
+  border: 1px solid #454545;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  min-width: 250px; /* Increased min-width */
+  max-width: 400px; /* Prevent wide filenames from breaking layout */
+  z-index: 1000;
+  padding: 4px 0;
+}
+
+.dropdown button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #cccccc;
+  padding: 6px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s;
+  gap: 10px;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+.dropdown button:hover:not(:disabled) {
+  background: #094771;
+  color: #ffffff;
+}
+
+.dropdown button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shortcut {
+  font-size: 11px;
+  color: #858585;
+  margin-left: auto; /* Push shortcut to the far right */
+}
+
+.separator {
+  height: 1px;
+  background: #454545;
+  margin: 4px 0;
+}
+
+.submenuLabel {
+  padding: 4px 12px;
+  font-size: 10px;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: default;
+}
+
+.recentFileItem {
+  font-size: 12px;
+  color: #cccccc !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Use flex-basis or width to ensure truncation works in flex container */
+  min-width: 0;
+  flex: 1;
+}
+
+/* Header Row Container */
+.submenuLabelWithAction {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 12px; /* Adjusted padding */
+  color: #666666;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  box-sizing: border-box;
+  width: 100%;
+  cursor: pointer; /* Indicate interactivity */
+}
+
+/* Highlight entire row on hover (User Request) */
+.submenuLabelWithAction:hover {
+  background: #383838;
+}
+
+.submenuLabelWithAction:hover span {
+  color: #e0e0e0; /* Highlight text */
+}
+
+.submenuLabelWithAction:hover .clearButton {
+  color: #e0e0e0;
+  opacity: 1;
+}
+
+.submenuLabelWithAction span {
+  white-space: nowrap;
+  flex: 1; /* Push button to right */
+}
+
+/* The actual button/icon */
+.clearButton {
+  background: transparent;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s;
+  opacity: 0.7;
+  margin-left: auto; /* Right align */
+}
+
+/* Individual button hover (optional extra feedback) */
+.clearButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.menuIcon {
+  color: #858585;
+  flex-shrink: 0;
+}

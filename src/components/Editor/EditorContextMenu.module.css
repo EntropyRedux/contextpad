@@ -1,0 +1,103 @@
+.contextMenu {
+  position: fixed;
+  background: #2d2d2d;
+  border: 1px solid var(--vscode-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  min-width: 180px;
+  z-index: 10000;
+}
+
+.contextMenu button {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--vscode-fg);
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.1s;
+}
+
+.contextMenu button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.contextMenu button:disabled {
+  color: #858585;
+  cursor: not-allowed;
+}
+
+.separator {
+  height: 1px;
+  background: var(--vscode-border);
+  margin: 4px 0;
+}
+
+.formHeader {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  color: var(--vscode-fg);
+  border-bottom: 1px solid var(--vscode-border);
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid var(--vscode-border);
+  color: var(--vscode-fg);
+  padding: 6px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.formButtons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.primaryButton {
+  flex: 1;
+  background: #0e639c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.primaryButton:hover {
+  background: #1177bb;
+}
+
+.secondaryButton {
+  flex: 1;
+  background: transparent;
+  color: var(--vscode-fg);
+  border: 1px solid var(--vscode-border);
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+}

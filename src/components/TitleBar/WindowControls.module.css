@@ -1,0 +1,28 @@
+.windowControls {
+  display: flex;
+  align-items: center;
+  height: 35px;
+}
+
+.btn {
+  background: none;
+  border: none;
+  color: var(--vscode-titlebar-fg);
+  width: 46px;
+  height: 35px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn.close:hover {
+  background: #e81123;
+  color: white;
+}

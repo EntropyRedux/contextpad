@@ -1,0 +1,261 @@
+/* Breadcrumb Bar - Monolithic Implementation Port */
+.breadcrumbBar {
+  position: relative;
+  width: 100%;
+  height: 22px;
+  background: #252526;
+  border-bottom: 1px solid #2b2b2b;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 12px;
+  color: #969696;
+  z-index: 100;
+  user-select: none;
+  flex-shrink: 0;
+  overflow-x: auto; /* Allow horizontal scrolling */
+  white-space: nowrap; /* Prevent wrapping */
+  gap: 0; /* Let wrappers handle spacing */
+}
+
+/* Scrollbar hiding for breadcrumb bar */
+.breadcrumbBar::-webkit-scrollbar {
+  height: 0px;
+  background: transparent;
+}
+
+.segmentWrapper {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Breadcrumb Segment (clickable) */
+.segment {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.segment:hover {
+  background: #2a2a2a;
+}
+
+.segmentOpen {
+  background: #094771;
+  color: #ffffff;
+}
+
+/* Icons */
+.icon {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* Segment Text */
+.text {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Chevron (dropdown indicator) */
+.chevron {
+  font-size: 10px;
+  opacity: 0.6;
+  transition: transform 0.2s;
+}
+
+.segmentOpen .chevron {
+  transform: rotate(90deg);
+}
+
+/* Separator between segments */
+.separator {
+  margin: 0 6px;
+  opacity: 0.5;
+}
+
+/* Dropdown Container */
+.dropdown {
+  background: #252526;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  max-width: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 4px 0;
+}
+
+/* Dropdown Item */
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #cccccc;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.dropdownItem:hover {
+  background: #094771;
+  color: #ffffff;
+}
+
+/* Item Icon */
+.itemIcon {
+  font-size: 11px;
+  opacity: 0.7;
+  width: 16px;
+  text-align: center;
+}
+
+/* Item Text */
+.itemText {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Empty Dropdown */
+.emptyDropdown {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #858585;
+  font-style: italic;
+}
+
+/* Explorer Button (Open in File Explorer) */
+.explorerBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #569cd6;
+  cursor: pointer;
+  transition: background-color 0.1s;
+  border-top: 1px solid #2b2b2b;
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+.explorerBtn:hover {
+  background: #094771;
+  color: #ffffff;
+}
+
+/* Rename Dialog */
+.renameDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.dialogContent {
+  background: #252526;
+  border: 1px solid #454545;
+  border-radius: 6px;
+  padding: 20px;
+  min-width: 400px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.dialogHeader {
+  font-size: 14px;
+  font-weight: 600;
+  color: #cccccc;
+  margin-bottom: 12px;
+}
+
+.renameInput {
+  width: 100%;
+  padding: 8px 12px;
+  background: #3c3c3c;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  color: #cccccc;
+  font-size: 13px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  outline: none;
+  margin-bottom: 16px;
+}
+
+.renameInput:focus {
+  border-color: #007acc;
+  background: #1e1e1e;
+}
+
+.dialogButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.primaryBtn {
+  padding: 6px 16px;
+  background: #0e639c;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.primaryBtn:hover {
+  background: #1177bb;
+}
+
+.secondaryBtn {
+  padding: 6px 16px;
+  background: transparent;
+  color: #cccccc;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.secondaryBtn:hover {
+  background: #3c3c3c;
+  border-color: #6c6c6c;
+}
+
+/* Scrollbar styling for dropdown */
+.dropdown::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dropdown::-webkit-scrollbar-track {
+  background: #252526;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 4px;
+}
+
+.dropdown::-webkit-scrollbar-thumb:hover {
+  background: #4e4e4e;
+}

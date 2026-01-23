@@ -1,0 +1,70 @@
+.item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Hollow triangle using border trick */
+.chevron::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  transition: transform 0.15s ease;
+}
+
+/* Collapsed state - right-pointing triangle */
+.chevron.collapsed::before {
+  border-width: 4px 0 4px 6px;
+  border-color: transparent transparent transparent #858585;
+  transform: translateX(1px);
+}
+
+/* Expanded state - down-pointing triangle */
+.chevron.expanded::before {
+  border-width: 6px 4px 0 4px;
+  border-color: #858585 transparent transparent transparent;
+  transform: translateY(-1px);
+}
+
+.chevron:hover::before {
+  border-left-color: #cccccc;
+  border-top-color: #cccccc;
+}
+
+.icon {
+  margin-right: 6px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.children {
+  padding-left: 16px;
+}

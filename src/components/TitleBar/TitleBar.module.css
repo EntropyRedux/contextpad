@@ -1,0 +1,94 @@
+.titleBar {
+  display: flex;
+  align-items: center;
+  height: 35px;
+  background: var(--vscode-titlebar-bg);
+  color: var(--vscode-titlebar-fg);
+  user-select: none;
+  border-bottom: 1px solid var(--vscode-tab-border);
+}
+
+.appIcon {
+  padding: 0 12px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+  cursor: default;
+}
+
+.tabBar {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 2px;
+  padding: 0 4px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  min-width: 120px;
+  max-width: 200px;
+  transition: background 0.15s;
+}
+
+.tab:hover {
+  background: #3d3d3d;
+}
+
+.tab.active {
+  background: #1e1e1e;
+}
+
+.tabTitle {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.addTabBtn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: color 0.15s;
+}
+
+.addTabBtn:hover {
+  color: #fff;
+}
+
+.iconImage {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  pointer-events: none; /* Allow drag region to work through the image */
+  -webkit-user-drag: none; /* Prevent image dragging in webkit browsers */
+}

@@ -1,0 +1,203 @@
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.editor {
+  height: 100%;
+  width: 100%;
+  background: var(--vscode-bg);
+  color: var(--vscode-fg);
+}
+
+.editor :global(.cm-editor) {
+  height: 100%;
+  background: var(--vscode-bg);
+  color: var(--vscode-fg);
+}
+
+.editor :global(.cm-scroller) {
+  overflow-y: auto !important;   /* Enable vertical scroll */
+  overflow-x: hidden !important; /* Disable horizontal scroll */
+  height: 100%;
+}
+
+/* Webkit scrollbar styling (Chrome, Safari, Edge) */
+.editor :global(.cm-scroller)::-webkit-scrollbar {
+  width: 14px;
+}
+
+.editor :global(.cm-scroller)::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.editor :global(.cm-scroller)::-webkit-scrollbar-thumb {
+  background-color: #424242;
+  border-radius: 7px;
+  border: 3px solid #1e1e1e; /* Creates padding effect */
+}
+
+.editor :global(.cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background-color: #4e4e4e;
+}
+
+/* Firefox scrollbar */
+.editor :global(.cm-scroller) {
+  scrollbar-width: thin;
+  scrollbar-color: #424242 #1e1e1e;
+}
+
+.editor :global(.cm-content) {
+  padding: 8px;
+  line-height: 1.4;
+}
+
+.editor :global(.cm-line) {
+  padding: 0 4px;
+}
+
+.editor :global(.cm-gutters) {
+  background: var(--vscode-bg);
+  border-right: 1px solid var(--vscode-border);
+  color: #858585;
+}
+
+.editor :global(.cm-activeLineGutter) {
+  background: #2a2a2b;
+}
+
+.editor :global(.cm-activeLine) {
+  background: #2a2a2b;
+}
+
+.editor :global(.cm-selectionBackground) {
+  background: #264f78 !important;
+}
+
+.editor :global(.cm-focused .cm-selectionBackground) {
+  background: #264f78 !important;
+}
+
+.editor :global(.cm-cursor) {
+  border-left-color: #ffffff;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #858585;
+  font-size: 14px;
+  background: var(--vscode-bg);
+}
+
+/* Hide native CodeMirror search panel - we use custom FloatingSearch component */
+.editor :global(.cm-panels-top),
+.editor :global(.cm-panels-bottom) {
+  display: none !important;
+}
+
+.editor :global(.cm-panel.cm-search) {
+  display: none !important;
+}
+
+/* Search match highlighting */
+.editor :global(.cm-searchMatch) {
+  background-color: rgba(255, 213, 0, 0.4) !important;
+  border-radius: 2px;
+}
+
+.editor :global(.cm-searchMatch-selected) {
+  background-color: rgba(255, 150, 0, 0.6) !important;
+  border-radius: 2px;
+}
+
+/* Selection matches (when text is selected, shows other occurrences) */
+.editor :global(.cm-selectionMatch) {
+  background-color: rgba(173, 214, 255, 0.3) !important;
+}
+
+/* Action Button Widget */
+.editor :global(.cm-action-button) {
+  background: #007acc;
+  color: white;
+  border: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  margin: 0 4px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.editor :global(.cm-action-button:hover) {
+  background: #005999;
+}
+
+.editor :global(.cm-action-error) {
+  background: #c62828 !important;
+  opacity: 0.8;
+}
+
+/* Template Variable Highlighting */
+.editor :global(.cm-template-variable) {
+  background: rgba(59, 130, 246, 0.1);
+  border-bottom: 2px solid #3b82f6;
+  padding: 0 2px;
+  border-radius: 2px;
+  color: #60a5fa;
+}
+
+/* Inline Formula Highlighting {=FORMULA()} */
+.editor :global(.cm-inline-formula) {
+  background: rgba(16, 185, 129, 0.15);
+  border-radius: 3px;
+  padding: 1px 2px;
+  color: #10b981;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.editor :global(.cm-inline-formula.cm-formula-error) {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-bottom: 2px wavy #ef4444;
+}
+
+/* Formula Run Button */
+.editor :global(.cm-formula-run-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
+  padding: 0;
+  background: #10b981;
+  border: none;
+  border-radius: 3px;
+  color: white;
+  font-size: 10px;
+  cursor: pointer;
+  vertical-align: middle;
+  opacity: 0.8;
+  transition: all 0.15s ease;
+}
+
+.editor :global(.cm-formula-run-btn:hover) {
+  opacity: 1;
+  background: #059669;
+  transform: scale(1.1);
+}
+
+.editor :global(.cm-formula-run-btn:active) {
+  transform: scale(0.95);
+}

@@ -1,0 +1,254 @@
+/* VS Code-like Find and Replace widget - positioned at top right of editor */
+.floatingSearch {
+  position: fixed;
+  top: 70px; /* Below title bar and menu bar */
+  right: 16px;
+  z-index: 2000;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+
+  background: #252526;
+  border: 1px solid #454545;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  padding: 4px;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #cccccc;
+
+  animation: slideDown 0.15s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Toggle button for replace row */
+.toggleReplace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.1s;
+  margin-top: 2px;
+}
+
+.toggleReplace:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cccccc;
+}
+
+.toggleReplace svg {
+  transition: transform 0.15s ease;
+}
+
+.rotated {
+  transform: rotate(90deg);
+}
+
+/* Main content area */
+.searchContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Find and Replace rows */
+.searchRow,
+.replaceRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Input with inline option buttons */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #3c3c3c;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.inputWrapper:focus-within {
+  border-color: #007acc;
+}
+
+.searchInput {
+  width: 200px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  color: #e0e0e0;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: #858585;
+}
+
+/* Option buttons inside input */
+.inputOptions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 4px;
+}
+
+.optionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #858585;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.optionBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cccccc;
+}
+
+.optionBtn.active {
+  background: #094771;
+  border-color: #007acc;
+  color: #ffffff;
+}
+
+/* Match info display */
+.matchInfo {
+  min-width: 70px;
+  text-align: center;
+}
+
+.matchCount {
+  font-size: 12px;
+  color: #858585;
+  white-space: nowrap;
+}
+
+/* Navigation buttons */
+.navButtons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #cccccc;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.selectAllIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Close button */
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #cccccc;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Replace row specific */
+.replaceRow .inputWrapper {
+  flex: 1;
+}
+
+.replaceRow .searchInput {
+  width: 200px;
+}
+
+.replaceButtons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* Account for the space where matchInfo and navButtons would be in search row */
+  margin-left: 4px;
+}
+
+.replaceBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #cccccc;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.replaceBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.replaceBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

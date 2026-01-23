@@ -1,0 +1,75 @@
+.item {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: #cccccc;
+  font-size: 13px;
+  line-height: 22px;
+  transition: background 0.1s ease;
+  user-select: none;
+}
+
+.item:hover {
+  background: #2a2d2e;
+  color: #ffffff;
+}
+
+.chevronButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 2px;
+  border-radius: 3px;
+}
+
+.chevronButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.chevronPlaceholder {
+  width: 22px;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  color: #858585;
+}
+
+.typeIcon {
+  color: #007acc; /* Use blue accent color for icons */
+}
+
+.bullet {
+  color: #858585;
+  width: 14px;
+  text-align: center;
+}
+
+.text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.lineNumber {
+  margin-left: 8px;
+  color: #858585;
+  font-size: 11px;
+  font-family: 'Consolas', monospace;
+  flex-shrink: 0;
+}
