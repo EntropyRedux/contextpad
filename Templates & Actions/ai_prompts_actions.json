@@ -36,17 +36,7 @@
   /^Here's an example.*/im,
   /^I hope this helps.*/im,
   /^Let me know if.*/im
-];\n
-let cleaned = text;
-cleaners.forEach(regex => {
-  cleaned = cleaned.replace(regex, '');
-});\n
-// Trim extra whitespace\ncleaned = cleaned.trim();\n
-if (helpers.getSelection()) {
-  helpers.replaceSelection(cleaned);
-} else {
-  helpers.replaceAllText(cleaned);
-}"
+];\n\nlet cleaned = text;\ncleaners.forEach(regex => {\n  cleaned = cleaned.replace(regex, '');\n});\n\n// Trim extra whitespace\ncleaned = cleaned.trim();\n\nif (helpers.getSelection()) {\n  helpers.replaceSelection(cleaned);\n} else {\n  helpers.replaceAllText(cleaned);\n}"
     },
     {
       "id": "action-format-user",
@@ -86,13 +76,7 @@ if (helpers.getSelection()) {
       "category": "AI Workflow",
       "enabled": true,
       "isDefault": false,
-      "code": "// Extract only content inside ``` blocks\nconst text = helpers.getSelection();\nconst regex = /```[\s\S]*?```/g;\nconst matches = text.match(regex);\n
-if (matches) {
-  helpers.replaceSelection(matches.join('\n\n'));
-} else {
-  // No code blocks found
-  // alert('No code blocks found'); // Alert not available in sandbox, maybe just do nothing
-}"
+      "code": "// Extract only content inside ``` blocks\nconst text = helpers.getSelection();\nconst regex = /```[\s\S]*?```/g;\nconst matches = text.match(regex);\n\nif (matches) {\n  helpers.replaceSelection(matches.join('\n\n'));\n} else {\n  // No code blocks found\n  // alert('No code blocks found'); // Alert not available in sandbox, maybe just do nothing\n}"
     },
     {
       "id": "action-formula-upper",
