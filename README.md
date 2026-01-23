@@ -50,7 +50,7 @@ ContextPad is a specialized workspace for **workflow drafting and automation**. 
 
 ### 📝 Documentation & Export
 *   **Markdown Core**: Full Markdown support with live syntax highlighting.
-*   **HTML Export**: Capability to download documentation as portable HTML.
+*   **HTML Export (Planned)**: Capability to download documentation as portable HTML.
 *   **Live HTML Preview (Planned)**: Hot-reloading preview window for real-time visualization of documentation.
 
 ### ⚙️ User Control
