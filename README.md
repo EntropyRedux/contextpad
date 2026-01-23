@@ -55,6 +55,7 @@ ContextPad is a specialized workspace for **workflow drafting and automation**. 
 
 ### ⚙️ User Control
 *   **Granular Settings**: Full control over font, themes, line numbers, word wrap, and large-file performance thresholds.
+*   **Accessibility**: Full support for native OS features like Windows **Voice Typing (`Win + H`)** for "talk-to-type" drafting.
 *   **Local-First**: Privacy-centric. All data, API keys (via OS keychain), and files stay on the local machine.
 
 ---

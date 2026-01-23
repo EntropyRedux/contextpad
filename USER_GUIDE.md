@@ -44,6 +44,11 @@ def hello():
 *   **Language Detection**: Specify the language after the triple backticks (e.g., ` ```json `) for accurate coloring.
 *   **Auto-Formatting**: The editor respects indentation and brackets for over 100 languages.
 
+### 🎙️ Talk to Type (Voice Typing)
+On Windows, ContextPad supports the native **Voice Typing** feature.
+*   **Shortcut**: Press **`Win + H`** while the editor is focused.
+*   **Usage**: Simply speak, and Windows will convert your voice to text directly into the active tab. This is a "no friction" way to quickly draft long prompts or notes.
+
 ---
 
 ## 3. Automation Tools
