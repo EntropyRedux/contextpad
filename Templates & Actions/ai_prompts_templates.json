@@ -3,6 +3,18 @@
   "source": "ContextPad Official",
   "templates": [
     {
+      "id": "cp-raw-response",
+      "name": "ContextPad: Raw Markdown Mode",
+      "category": "AI Setup",
+      "content": "I am using a tool called ContextPad that processes raw text. Please output your ENTIRE response inside a single Markdown code block.\n\n**Rules:**\n1. Do NOT write any conversational text outside the code block (no \"Sure!\" or \"Here is the file\").\n2. Start immediately with ````markdown`.\n3. Put all your headers, lists, and content inside that block.\n4. End with ````."
+    },
+    {
+      "id": "cp-long-doc",
+      "name": "ContextPad: Long Doc Protocol",
+      "category": "AI Setup",
+      "content": "I need you to generate a LONG document. To ensure I can copy it easily into ContextPad, follow this strict protocol:\n\n1. **Wrap Everything:** All output must be inside ````markdown` code blocks.\n2. **The Cut-off Rule:** If you are about to run out of token space:\n   - STOP writing.\n   - Close the current code block with ````.\n   - Write **[CONTINUE]**\" outside the block.\n   - Stop generating.\n\n3. **Resuming:** When I say \"Continue\", start a NEW code block immediately and pick up exactly where you left off.\n\n**Task:** {{task_description}}"
+    },
+    {
       "id": "dev-sys-arch",
       "name": "System Architecture Planner",
       "category": "Software Development",
