@@ -1,9 +1,15 @@
 # ContextPad
 
-**Version**: 1.2.0
-**Status**: Phase 1 Complete
+**Version**: 1.3.3
+**Status**: Stable Release
 
 A minimal, fast text editor with syntax highlighting and modern IDE features. Built with Tauri 2.x + React 18 + CodeMirror 6.
+
+## 🚀 Downloads
+
+You can download the latest pre-built binaries from the [releases](./releases) folder:
+- **[ContextPad-v1.3.3.exe](./releases/ContextPad-v1.3.3.exe)**: Standalone portable executable.
+- **[ContextPad-v1.3.3-Setup.exe](./releases/ContextPad-v1.3.3-Setup.exe)**: Windows installer.
 
 ## Features
 
@@ -19,6 +25,8 @@ A minimal, fast text editor with syntax highlighting and modern IDE features. Bu
 - **100% Offline**: No internet required.
 
 ### 🛠️ Editor Tools
+- **Sidebar (New)**: Integrated File Explorer, Markdown Outline, and Template Manager.
+- **Token Estimator (New)**: Real-time token counting for various LLM models (GPT, Anthropic, Gemini).
 - **Find & Replace**: Floating search widget with full regex support.
 - **Command Palette**: Quick access to commands.
 - **Settings UI**: Configurable font, theme, word wrap, line numbers, and more.
@@ -56,7 +64,7 @@ npm run tauri:dev
 npm run tauri:build
 ```
 
-Executable location: `src-tauri/target/release/contextpad-tauri.exe`
+Executable location: `src-tauri/target/release/contextpad.exe`
 
 ## Tech Stack
 - **Frontend**: React 18.3.1, TypeScript 4.9.5, Vite 5.4.21
@@ -71,33 +79,16 @@ contextpad/
 ├── src/                    # React frontend
 │   ├── components/         # UI components
 │   │   ├── Editor/         # Editor & Search
-│   │   ├── Settings/       # Settings UI
+│   │   ├── Sidebar/        # File Explorer & Tools
 │   │   └── ...
 │   ├── hooks/              # Custom React hooks
 │   ├── store/              # Zustand state (Tabs, Settings, etc.)
 │   ├── extensions/         # CodeMirror extensions
-│   └── services/           # Utilities
+│   └── services/           # Utilities (Token Estimator, etc.)
 ├── src-tauri/              # Rust backend
 │   └── src/commands/       # Tauri commands
-└── Documentation/          # Project docs
+└── releases/               # Pre-built binaries
 ```
-
-## Documentation
-- [`CHANGELOG.md`](Documentation/CHANGELOG.md) - Version history
-- [`app-status-0108.md`](Documentation/app-status-0108.md) - Detailed status report
-- [`v0.2.0-implementation-summary.md`](Documentation/v0.2.0-implementation-summary.md) - Implementation details
-- [`contextpad-build-plan.md`](Documentation/contextpad-build-plan.md) - Development roadmap
-
-## Roadmap
-
-### v1.3.0 (Planned)
-- Split editor view
-- Plugin system foundation
-- Enhanced Markdown preview
-- File tree sidebar (Project view)
 
 ## License
 GPL v3
-
-## Contributing
-This is an active development project. See `Documentation/contextpad-build-plan.md` for planned features.
