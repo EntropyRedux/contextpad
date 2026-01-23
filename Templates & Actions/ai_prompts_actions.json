@@ -1,0 +1,118 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-01-23T12:00:00.000Z",
+  "actions": [
+    {
+      "id": "action-wrap-xml",
+      "name": "Wrap in XML Context",
+      "description": "Wraps selected text in <context> tags for Claude/LLMs",
+      "type": "command",
+      "category": "AI Workflow",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Wrap selection in XML tags\nconst text = helpers.getSelection();\nif (text) {\n  helpers.replaceSelection(`<context>\n${text}\n</context>`);\n} else {\n  helpers.insertAtCursor('<context>\n\n</context>');\n}"
+    },
+    {
+      "id": "action-wrap-triples",
+      "name": "Wrap in Triple Quotes",
+      "description": "Wraps selection in \"\"\" for Python/LLM delimiter",
+      "type": "command",
+      "category": "AI Workflow",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Wrap selection in triple quotes\nconst text = helpers.getSelection();\nhelpers.replaceSelection(`\"\"\"\n${text}\n\"\"\"`);"
+    },
+    {
+      "id": "action-clean-ai-chat",
+      "name": "Clean AI Chat Garbage",
+      "description": "Removes 'Sure!', 'Here is the code', etc.",
+      "type": "command",
+      "category": "AI Workflow",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Remove common conversational filler from AI responses\nconst text = helpers.getSelection() || helpers.getAllText();\n\n// Regex for common headers/footers\nconst cleaners = [
+  /^Sure, here is.*/im,
+  /^Certainly!.*/im,
+  /^Here's an example.*/im,
+  /^I hope this helps.*/im,
+  /^Let me know if.*/im
+];\n
+let cleaned = text;
+cleaners.forEach(regex => {
+  cleaned = cleaned.replace(regex, '');
+});\n
+// Trim extra whitespace\ncleaned = cleaned.trim();\n
+if (helpers.getSelection()) {
+  helpers.replaceSelection(cleaned);
+} else {
+  helpers.replaceAllText(cleaned);
+}"
+    },
+    {
+      "id": "action-format-user",
+      "name": "Format as User Msg",
+      "description": "Prepends 'User: ' to selection",
+      "type": "button",
+      "category": "Chat formatting",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Format selection as a User message\nconst text = helpers.getSelection();\nhelpers.replaceSelection(`**User:**\n${text}\n\n---\n`);"
+    },
+    {
+      "id": "action-format-assistant",
+      "name": "Format as AI Msg",
+      "description": "Prepends 'Assistant: ' to selection",
+      "type": "button",
+      "category": "Chat formatting",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Format selection as an Assistant message\nconst text = helpers.getSelection();\nhelpers.replaceSelection(`**Assistant:**\n${text}\n\n---\n`);"
+    },
+    {
+      "id": "action-minify-context",
+      "name": "Minify for Context",
+      "description": "Removes extra newlines to save tokens",
+      "type": "command",
+      "category": "Token Saving",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Remove multiple newlines and trim lines\nconst text = helpers.getSelection();\n// Replace 3+ newlines with 2, trim lines\nconst minified = text.split('\n').map(l => l.trim()).filter(l => l).join('\n');\nhelpers.replaceSelection(minified);"
+    },
+    {
+      "id": "action-extract-code",
+      "name": "Extract Code Blocks",
+      "description": "Keeps ONLY the code blocks from selection",
+      "type": "command",
+      "category": "AI Workflow",
+      "enabled": true,
+      "isDefault": false,
+      "code": "// Extract only content inside ``` blocks\nconst text = helpers.getSelection();\nconst regex = /```[\s\S]*?```/g;\nconst matches = text.match(regex);\n
+if (matches) {
+  helpers.replaceSelection(matches.join('\n\n'));
+} else {
+  // No code blocks found
+  // alert('No code blocks found'); // Alert not available in sandbox, maybe just do nothing
+}"
+    },
+    {
+      "id": "action-formula-upper",
+      "name": "UPPERCASE (Formula)",
+      "description": "Formula example: Converts to uppercase",
+      "type": "command",
+      "category": "Formulas",
+      "enabled": true,
+      "isDefault": false,
+      "code": "FORMULA:UPPER()"
+    },
+    {
+      "id": "action-formula-clean",
+      "name": "Clean Whitespace",
+      "description": "Formula example: TRIMS text",
+      "type": "command",
+      "category": "Formulas",
+      "enabled": true,
+      "isDefault": false,
+      "code": "FORMULA:TRIM()"
+    }
+  ]
+}

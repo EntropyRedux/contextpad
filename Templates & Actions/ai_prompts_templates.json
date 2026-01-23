@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "source": "ContextPad Official",
+  "templates": [
+    {
+      "id": "dev-sys-arch",
+      "name": "System Architecture Planner",
+      "category": "Software Development",
+      "content": "You are an expert System Architect. I need you to design a high-level architecture for the following system:\n\n**System Name:** {{system_name}}\n**Core Function:** {{core_function}}\n**Constraints:**\n- {{constraints}}\n\nPlease provide:\n1. A high-level diagram description (Mermaid syntax).\n2. Tech Stack recommendations with justification.\n3. Data Flow analysis.\n4. Potential bottlenecks and mitigation strategies."
+    },
+    {
+      "id": "dev-bug-refiner",
+      "name": "Bug Report Refiner",
+      "category": "Software Development",
+      "content": "Refine the following bug report to be more actionable for developers. Ensure it has clear steps to reproduce, expected vs actual behavior, and severity assessment.\n\n**Raw Report:**\n{{raw_bug_report}}\n\n**Environment Details:**\n{{environment}}\n\nOutput the refined report in Markdown format."
+    },
+    {
+      "id": "dev-unit-test",
+      "name": "Unit Test Generator",
+      "category": "Software Development",
+      "content": "Generate comprehensive unit tests for the following code block. Cover edge cases, happy paths, and error handling.\n\n**Language:** {{language}}\n**Testing Framework:** {{framework}}\n\n**Code:**\n```{{language}}\n{{code_block}}\n```"
+    },
+    {
+      "id": "doc-api-endpoint",
+      "name": "API Endpoint Documentation",
+      "category": "Documentation",
+      "content": "## {{method}} {{endpoint_path}}\n\n**Summary:** {{summary}}\n\n### Request\n*   **Headers:** `{{headers}}`\n*   **Body:**\n    ```json\n    {{request_body_example}}\n    ```\n\n### Response\n*   **Status 200 OK**\n    ```json\n    {{response_body_example}}\n    ```\n*   **Error Codes:**\n    *   `400`: Bad Request\n    *   `401`: Unauthorized"
+    },
+    {
+      "id": "doc-readme-section",
+      "name": "README Feature Section",
+      "category": "Documentation",
+      "content": "### {{feature_name}}\n\n{{feature_description}}\n\n**Key Benefits:**\n- {{benefit_1}}\n- {{benefit_2}}\n\n**Usage Example:**\n```bash\n{{usage_command}}\n```"
+    },
+    {
+      "id": "flow-meeting-summary",
+      "name": "Meeting Summarizer",
+      "category": "Workflow Automation",
+      "content": "Summarize the following meeting notes into a structured format.\n\n**Context:** {{meeting_context}}\n\n**Raw Notes:**\n{{raw_notes}}\n\n**Required Output:**\n1. **Executive Summary** (2-3 sentences)\n2. **Key Decisions Made**\n3. **Action Items** (Who, What, By When)\n4. **Open Questions**"
+    },
+    {
+      "id": "flow-email-polisher",
+      "name": "Professional Email Polisher",
+      "category": "Workflow Automation",
+      "content": "Rewrite the following email draft to be more professional, concise, and persuasive. Tone should be {{tone}}.\n\n**Draft:**\n{{email_draft}}"
+    },
+    {
+      "id": "flow-prompt-improver",
+      "name": "Prompt Improver (Meta)",
+      "category": "Workflow Automation",
+      "content": "Act as a Prompt Engineering expert. Critique and improve the following prompt for better LLM performance (Chain-of-Thought, clarity, delimiters).\n\n**My Prompt:**\n{{user_prompt}}\n\n**Target Model:** {{target_model}}\n\nPlease provide:\n1. A critique of the original.\n2. An optimized version.\n3. Explanation of changes."
+    }
+  ]
+}
