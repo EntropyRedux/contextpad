@@ -3,7 +3,7 @@
 **Version**: 1.3.3  
 **Status**: Stable Release  
 **Philosophy**: Simple. Fast. No Friction.  
-**Core Truth**: This app exists *before real work begins*. It lives between thinking and execution—where ideas become clear enough to hand off.
+**Core Truth**: This app exists *before real work begins*. It lives between thinking and execution; where ideas become clear enough to hand off.
 
 ---
 
