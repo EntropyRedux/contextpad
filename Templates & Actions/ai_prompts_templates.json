@@ -15,10 +15,46 @@
       "content": "I need you to generate a LONG document. To ensure I can copy it easily into ContextPad, follow this strict protocol:\n\n1. **Wrap Everything:** All output must be inside ````markdown` code blocks.\n2. **The Cut-off Rule:** If you are about to run out of token space:\n   - STOP writing.\n   - Close the current code block with ````.\n   - Write \"**[CONTINUE]**\" outside the block.\n   - Stop generating.\n\n3. **Resuming:** When I say \"Continue\", start a NEW code block immediately and pick up exactly where you left off.\n\n**Task:** {{task_description}}"
     },
     {
-      "id": "pe-notebook",
-      "name": "Prompt Engineering Notebook",
+      "id": "pe-python-runner",
+      "name": "Python API Runner (OpenAI)",
       "category": "Software Development",
-      "content": "# Prompt Engineering Workbench\n\n**Goal:** {{goal}}\n**Model:** {{model_name}}\n\n## 1. Baseline Prompt\n```python\nsystem_prompt = \"\"\"\n{{baseline_system_prompt}}\n\"\"\"\n\nuser_input = \"\"\"\n{{test_case_input}}\n\"\"\"```\n\n## 2. Iteration Log\n| Run # | Change Description | Result Quality (1-10) | Notes |\n|-------|-------------------|-----------------------|-------|\n| 1     | Baseline          |                       |       |\n| 2     |                   |                       |       |\n\n## 3. Refined Prompt Candidate\n```python\n# Iteration {{iteration_number}}\nsystem_prompt_v2 = \"\"\"\n{{refined_prompt}}\n\"\"\"```"
+      "content": "```python\nimport os\nfrom openai import OpenAI\n
+# Initialize Client\nclient = OpenAI(api_key=os.getenv(\"OPENAI_API_KEY\"))\n
+# Configuration\nMODEL = \"gpt-4o\"\nTEMP = 0.7\n
+# The Prompt\nsystem_prompt = \"\"\"
+{{system_prompt}}
+\"\"\"
+
+user_input = \"\"\"
+{{user_input}}
+\"\"\"
+
+# Execute\nresponse = client.chat.completions.create(
+    model=MODEL,
+    messages=[
+        {\"role\": \"system\", \"content\": system_prompt},
+        {\"role\": \"user\", \"content\": user_input}
+    ],
+    temperature=TEMP,
+)
+
+# Output\nprint(response.choices[0].message.content)
+```"
+    },
+    {
+      "id": "pe-notebook",
+      "name": "Prompt Engineering Workbench",
+      "category": "Software Development",
+      "content": "# Prompt Engineering Workbench\n\n**Goal:** {{goal}}\n**Model:** {{model_name}}\n
+## 1. Baseline Prompt\n```python\nsystem_prompt = \"\"\"
+{{baseline_system_prompt}}
+\"\"\"
+```\n
+## 2. Iteration Log\n| Run # | Change Description | Result Quality (1-10) | Notes |\n|-------|-------------------|-----------------------|-------|\n| 1     | Baseline          |                       |       |\n| 2     |                   |                       |       |\n
+## 3. Refined Prompt Candidate\n```python\n# Iteration {{iteration_number}}\nsystem_prompt_v2 = \"\"\"
+{{refined_prompt}}
+\"\"\"
+```"
     },
     {
       "id": "dev-sys-arch",
