@@ -46,7 +46,7 @@ ContextPad is a specialized workspace for **workflow drafting and automation**. 
 ### 🤖 AI-Centric Tools
 *   **Token Estimators**: Real-time token calculations for OpenAI, Anthropic, and Google Gemini models.
 *   **Cost Projection**: Instant financial visibility of prompt costs based on current model pricing.
-*   **AI Blueprint Exports (Planned)**: Specialized formatting designed to optimize how LLMs ingest and understand your drafted content.
+*   **AI Blueprint Exports (Planned)**: Specialized `.cntxt` file format (Markdown-based) designed to optimize how LLMs ingest and understand your drafted content while maintaining human readability.
 
 ### 📝 Documentation & Export
 *   **Markdown Core**: Full Markdown support with live syntax highlighting.
