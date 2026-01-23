@@ -69,12 +69,11 @@ ContextPad will implement a single, standardized parser for fenced code block me
 ```language {key=value, boolean_flag, "quoted key"="value"}
 code here...
 ```
-```
 
 This system will handle:
 1.  **Action Manager Ignore Flags**: ` {ignore=true} ` prevents specific blocks from being processed by automation.
 2.  **HTML Rendering Options**: ` {render="interactive"} ` controls how blocks appear in documentation exports.
-3.  **AI Blueprint Context**: ` {ai_role="system_prompt"} ` tags blocks with semantic meaning for LLMs.
+3.  **AI Blueprint Context**: ` {ai_role="system_prompt"} ` tags blocks with semantic meaning for LLMs. Useful for vector embeddings, document frontmatter.
 
 ---
 
