@@ -12,7 +12,13 @@
       "id": "cp-long-doc",
       "name": "ContextPad: Long Doc Protocol",
       "category": "AI Setup",
-      "content": "I need you to generate a LONG document. To ensure I can copy it easily into ContextPad, follow this strict protocol:\n\n1. **Wrap Everything:** All output must be inside ````markdown` code blocks.\n2. **The Cut-off Rule:** If you are about to run out of token space:\n   - STOP writing.\n   - Close the current code block with ````.\n   - Write **[CONTINUE]**\" outside the block.\n   - Stop generating.\n\n3. **Resuming:** When I say \"Continue\", start a NEW code block immediately and pick up exactly where you left off.\n\n**Task:** {{task_description}}"
+      "content": "I need you to generate a LONG document. To ensure I can copy it easily into ContextPad, follow this strict protocol:\n\n1. **Wrap Everything:** All output must be inside ````markdown` code blocks.\n2. **The Cut-off Rule:** If you are about to run out of token space:\n   - STOP writing.\n   - Close the current code block with ````.\n   - Write \"**[CONTINUE]**\" outside the block.\n   - Stop generating.\n\n3. **Resuming:** When I say \"Continue\", start a NEW code block immediately and pick up exactly where you left off.\n\n**Task:** {{task_description}}"
+    },
+    {
+      "id": "pe-notebook",
+      "name": "Prompt Engineering Notebook",
+      "category": "Software Development",
+      "content": "# Prompt Engineering Workbench\n\n**Goal:** {{goal}}\n**Model:** {{model_name}}\n\n## 1. Baseline Prompt\n```python\nsystem_prompt = \"\"\"\n{{baseline_system_prompt}}\n\"\"\"\n\nuser_input = \"\"\"\n{{test_case_input}}\n\"\"\"```\n\n## 2. Iteration Log\n| Run # | Change Description | Result Quality (1-10) | Notes |\n|-------|-------------------|-----------------------|-------|\n| 1     | Baseline          |                       |       |\n| 2     |                   |                       |       |\n\n## 3. Refined Prompt Candidate\n```python\n# Iteration {{iteration_number}}\nsystem_prompt_v2 = \"\"\"\n{{refined_prompt}}\n\"\"\"```"
     },
     {
       "id": "dev-sys-arch",
