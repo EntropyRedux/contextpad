@@ -26,7 +26,7 @@ The editor is built on CodeMirror 6 and utilizes a "Compartment" system for dyna
 *   **Compartments:** `fontThemeCompartment`, `colorThemeCompartment`, and `languageCompartment` allow hot-swapping of themes, fonts, and syntax highlighting without destroying the editor instance.
 *   **Large File Mode:** The editor automatically detects large files based on line count (default > 5000 lines). In this mode, resource-intensive features (Bracket Matching, Fold Gutter, AST-based Markdown Highlighting) are disabled to ensure 60fps scrolling performance.
 *   **Extensions Pipeline:** The editor loads a custom extension stack including:
-    *   `slashCommands`: Triggered by `/`.
+    *   `slashCommands`: Despite the name, these are explicitly triggered via **`CTRL + SPACE`** (Keyboard) or **`CTRL + RIGHT CLICK`** (Mouse) to avoid friction with normal text entry. They provide an inline palette for actions and templates.
     *   `templateVariables`: Decorates `{{variable}}` patterns.
     *   `inlineFormulas`: Detects `{=FORMULA()}` syntax.
     *   `autocomplete`: Context-aware completion engine.
