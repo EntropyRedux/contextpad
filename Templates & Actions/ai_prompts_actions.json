@@ -30,13 +30,7 @@
       "category": "AI Workflow",
       "enabled": true,
       "isDefault": false,
-      "code": "// Remove common conversational filler from AI responses\nconst text = helpers.getSelection() || helpers.getAllText();\n\n// Regex for common headers/footers\nconst cleaners = [
-  /^Sure, here is.*/im,
-  /^Certainly!.*/im,
-  /^Here's an example.*/im,
-  /^I hope this helps.*/im,
-  /^Let me know if.*/im
-];\n\nlet cleaned = text;\ncleaners.forEach(regex => {\n  cleaned = cleaned.replace(regex, '');\n});\n\n// Trim extra whitespace\ncleaned = cleaned.trim();\n\nif (helpers.getSelection()) {\n  helpers.replaceSelection(cleaned);\n} else {\n  helpers.replaceAllText(cleaned);\n}"
+      "code": "// Remove common conversational filler from AI responses\nconst text = helpers.getSelection() || helpers.getAllText();\n\n// Regex for common headers/footers\nconst cleaners = [\n  /^Sure, here is.*/im,\n  /^Certainly!.*/im,\n  /^Here's an example.*/im,\n  /^I hope this helps.*/im,\n  /^Let me know if.*/im\n];\n\nlet cleaned = text;\ncleaners.forEach(regex => {\n  cleaned = cleaned.replace(regex, '');\n});\n\n// Trim extra whitespace\ncleaned = cleaned.trim();\n\nif (helpers.getSelection()) {\n  helpers.replaceSelection(cleaned);\n} else {\n  helpers.replaceAllText(cleaned);\n}"
     },
     {
       "id": "action-format-user",
@@ -66,7 +60,7 @@
       "category": "Token Saving",
       "enabled": true,
       "isDefault": false,
-      "code": "// Remove multiple newlines and trim lines\nconst text = helpers.getSelection();\n// Replace 3+ newlines with 2, trim lines\nconst minified = text.split('\n').map(l => l.trim()).filter(l => l).join('\n');\nhelpers.replaceSelection(minified);"
+      "code": "// Remove multiple newlines and trim lines\nconst text = helpers.getSelection();\n// Replace 3+ newlines with 2, trim lines\nconst minified = text.split('\\n').map(l => l.trim()).filter(l => l).join('\\n');\nhelpers.replaceSelection(minified);"
     },
     {
       "id": "action-extract-code",
@@ -76,7 +70,7 @@
       "category": "AI Workflow",
       "enabled": true,
       "isDefault": false,
-      "code": "// Extract only content inside ``` blocks\nconst text = helpers.getSelection();\nconst regex = /```[\s\S]*?```/g;\nconst matches = text.match(regex);\n\nif (matches) {\n  helpers.replaceSelection(matches.join('\n\n'));\n} else {\n  // No code blocks found\n  // alert('No code blocks found'); // Alert not available in sandbox, maybe just do nothing\n}"
+      "code": "// Extract only content inside ``` blocks\nconst text = helpers.getSelection();\nconst regex = /```[\\s\\S]*?```/g;\nconst matches = text.match(regex);\n\nif (matches) {\n  helpers.replaceSelection(matches.join('\\n\\n'));\n} else {\n  // No code blocks found\n}"
     },
     {
       "id": "action-formula-upper",
