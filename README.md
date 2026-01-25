@@ -22,9 +22,9 @@ Standard text editors are too simple for complex drafting, and IDEs are too bloa
 - **Workspace Navigation:** Folder-aware breadcrumbs and headers-based document outline.
 
 ## Quick Start
-1. Download the latest binary from `/releases`.
+1. Download the latest binary from [/releases](./releases).
 2. Open a workspace folder (`Ctrl+K Ctrl+O`).
-3. Use the Welcome tab for an interactive walkthrough.
+3. Use the Welcome tab or read the [User Guide](./USER_GUIDE.md) for instructions.
 
 ## Requirements
 - OS: Windows, macOS, or Linux (Tauri-supported).
