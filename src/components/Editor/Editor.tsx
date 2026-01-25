@@ -12,6 +12,8 @@ import { slashCommandsExtension, triggerCommandPalette } from '../../extensions/
 import { actionButtonPlugin } from '../../extensions/actionButtons'
 import { variablePlugin, tabNavigateVariables } from '../../extensions/templateVariables'
 import { inlineFormulaExtension } from '../../extensions/inlineFormulas'
+import { codeBlockParamsExtension } from '../../extensions/codeBlockParams'
+import { lockedEditorExtension } from '../../extensions/lockedEditor'
 import { autocompleteService } from '../../services/autocompleteService'
 import { spellCheckService } from '../../services/spellCheckService'
 import { codeLintService } from '../../services/codeLintService'
@@ -77,6 +79,7 @@ const languageCompartment = new Compartment()
 const autocompleteCompartment = new Compartment()
 const spellCheckCompartment = new Compartment()
 const codeLintCompartment = new Compartment()
+const markersCompartment = new Compartment()
 
 export function Editor({ tabId, initialContent, onChange }: EditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
@@ -162,8 +165,10 @@ export function Editor({ tabId, initialContent, onChange }: EditorProps) {
           ? codeLintService.createExtension(viewSettings.codeLintConfig, viewSettings.indexingScope)
           : []
       ),
+      markersCompartment.of(codeBlockParamsExtension(viewSettings.showCodeBlockMarkers)),
       slashCommandsExtension(),
       actionButtonPlugin,
+      lockedEditorExtension(),
       variablePlugin,
       tabNavigateVariables,
       ...inlineFormulaExtension,
@@ -302,6 +307,15 @@ export function Editor({ tabId, initialContent, onChange }: EditorProps) {
       })
     }
   }, [viewSettings.enableCodeLinting, viewSettings.codeLintConfig, viewSettings.indexingScope])
+
+  // Update code block markers when settings change
+  useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: markersCompartment.reconfigure(codeBlockParamsExtension(viewSettings.showCodeBlockMarkers))
+      })
+    }
+  }, [viewSettings.showCodeBlockMarkers])
 
   return (
     <div className={styles.editorContainer}>

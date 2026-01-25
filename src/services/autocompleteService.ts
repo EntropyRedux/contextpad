@@ -7,6 +7,7 @@ import {
 import { Extension } from '@codemirror/state'
 import { syntaxTree } from '@codemirror/language'
 import { slashCommandCompletions } from '../extensions/slashCommands'
+import { codeBlockParamsCompletions } from '../extensions/codeBlockParams'
 
 interface AutocompleteConfig {
   activateOnTyping: boolean
@@ -29,6 +30,7 @@ export class AutocompleteService {
       maxRenderedOptions: config.maxRenderedOptions,
       override: [
         slashCommandCompletions,
+        codeBlockParamsCompletions,
         this.combinedCompletion.bind(this, config, indexingScope)
       ],
       defaultKeymap: true,

@@ -1,124 +1,86 @@
-# ContextPad User Guide
+# User Guide (Operational Manual)
 
-Welcome to **ContextPad**. This guide will help you master the "sharp tool" designed for prompt engineering, workflow drafting, and AI context management.
+## Last updated since
+January 25, 2026
 
----
+## Who this is for
+ContextPad is designed for power users who work with structured text and AI:
+- **Prompt Engineers:** Building complex, multi-block context windows for LLMs.
+- **Technical Writers:** Drafting Markdown documentation with reusable snippets.
+- **Developers:** Rapidly reformatting logs, JSON, or CSV data using logic.
+- **Data Analysts:** Transforming raw text into structured Markdown tables.
 
-## 1. Workspace & Navigation
+## Installation
+1. **Download:** Go to the `releases/` directory in the repository.
+2. **Execute:** 
+   - **Windows:** Run `ContextPad-v1.5.0.exe`.
+   - **macOS/Linux:** Run the corresponding platform binary.
+3. **No Setup:** The application is portable; it stores all data in the user's local application data folder.
 
-### Setting Up Your Workspace
-ContextPad works best when grounded in a project folder.
-1.  **Open Folder**: Use `File > Open Workspace` (or `Ctrl+K Ctrl+O`) to select a root directory on your computer.
-2.  **Persistence**: The app remembers this workspace between sessions.
+## Basic Usage
+### 1. Workspace Drafting
+- **Create Tabs:** Press `Ctrl+N` for a new blank tab.
+- **Save Work:** The app uses **Multi-Tiered Persistence**. Metadata is saved instantly to LocalStorage, while document content is saved to **IndexedDB** after 2 seconds of inactivity.
+- **Markdown Highlighting:** Full syntax highlighting is provided for Markdown, including code blocks for JS, Python, YAML, and JSON.
 
-### 🍞 Breadcrumb Navigation
-The bar at the top of the editor isn't just for show. It is your **mini file explorer**.
-*   **Path View**: Shows exactly where the current file lives relative to your workspace root.
-*   **Quick Jump**: Click any folder name in the breadcrumb path to dropdown a list of files in that folder. This allows rapid navigation without opening the full sidebar.
+### 2. Navigation
+- **Breadcrumb Quick Jump:** Click any segment of the path in the top bar to see all files in that folder. Click a file to open it instantly.
+- **Outline Navigation:** Press `Ctrl+B` to open the left sidebar. Click any header (`#`, `##`, etc.) to jump to that section in the document.
+- **Tab Reordering:** Drag and drop tabs horizontally to organize your session.
 
-### 📑 Document Outline (`Ctrl+B`)
-For long documents, navigating by scrollbar is inefficient.
-*   **Toggle Sidebar**: Press `Ctrl+B` or click the Sidebar icon in the top left.
-*   **Structure**: The "Outline" tab analyzes your Markdown headers (`#`, `##`, `###`) and creates a clickable table of contents.
-*   **File Tree**: Switch to the "Files" tab to see the full directory structure of your workspace.
+### 3. Text Transformation
+- **Manager Sidebar:** Press `Ctrl+Shift+A` or `Ctrl+Shift+T` to open the Action or Template managers.
+- **Execution:** Select text in the editor, find an item in the sidebar, and click the **Play (▶)** button.
 
----
+## Configuration
+### Editor Settings (`Ctrl+,`)
+- **Theme:** Switch between *One Dark*, *Dracula*, *GitHub Light/Dark*, *Nord*, and *VS Code*.
+- **Font Family:** Supports system monospaced fonts (Default: Consolas).
+- **Word Wrap:** Toggle to prevent horizontal scrolling.
+- **Line Numbers:** Toggle for a cleaner reading view.
 
-## 2. Markdown & Formatting
+### Performance & Safety
+- **Large File Threshold:** (Default: 5000 lines). For files exceeding this, ContextPad disables heavy AST-based syntax highlighting and bracket matching to maintain 60fps scrolling.
+- **Spell Check Mode:** Choose between *Built-in* (custom dictionary) or *Browser* (native OS engine).
+- **API Keys:** Enter keys for Anthropic or Google Gemini in the Settings tab to enable billing-grade token counting. Keys are stored securely in your OS Keychain.
 
-ContextPad is a "Markdown-First" editor.
+## Common Tasks
+### Creating a Dynamic Template
+1. Open the **Template Manager** in the right sidebar.
+2. Click the **Plus (+)** button.
+3. Enter a name and content using `{{variable}}` syntax (e.g., `Hello {{name}}!`).
+4. Click **Create**.
+5. To use: Click the template in the sidebar. Use **Tab** to jump between placeholders in the editor.
 
-### Basic Syntax
-*   **Headers**: `# H1`, `## H2`, `### H3`
-*   **Emphasis**: `**Bold**`, `*Italic*`, `~~Strikethrough~~`
-*   **Lists**: `- Bullet point` or `1. Numbered list`
-*   **Links**: `[Text](url)`
-*   **Quotes**: `> Blockquote`
+### Transforming CSV to a Markdown Table
+1. Paste your CSV data into the editor.
+2. Select the CSV text.
+3. In the editor, type `{=CSVTABLE(selection)}`.
+4. Press `Ctrl+Enter`. The CSV will be replaced by a perfectly formatted Markdown table.
 
-### 💻 Code Blocks
-ContextPad automatically detects and highlights code blocks.
-```python
-def hello():
-    print("Syntax Highlighting is automatic")
-```
-*   **Language Detection**: Specify the language after the triple backticks (e.g., ` ```json `) for accurate coloring.
-*   **Auto-Formatting**: The editor respects indentation and brackets for over 100 languages.
+### Using Locked "Form" Blocks
+1. Wrap your text in a code block:
+   ```yaml {lock, exclude="variables"}
+   System: [[You are a helpful assistant]]
+   User: [[Your name here]]
+   ```
+2. The block is now read-only EXCEPT for the text inside `[[...]]`.
+3. If you delete the content of a field, it will auto-restore its default value when you move the cursor.
 
-### 🎙️ Talk to Type (Voice Typing)
-On Windows, ContextPad supports the native **Voice Typing** feature.
-*   **Shortcut**: Press **`Win + H`** while the editor is focused.
-*   **Usage**: Simply speak, and Windows will convert your voice to text directly into the active tab. This is a "no friction" way to quickly draft long prompts or notes.
+### Managing Workflows
+- **Pinning:** Click the **Star** icon on any Action or Template to add it to your **Pinned Workflows**.
+- **Navigation:** Single-click a pinned icon in the Activity Bar to jump to its open tab. Double-click to force open a fresh copy.
 
----
+## Errors & Troubleshooting
+| Symptom | Probable Cause | Fix |
+|---------|----------------|-----|
+| **Editor feels laggy** | File exceeds performance threshold. | Increase "Large File Threshold" or disable "Bracket Matching" in Settings. |
+| **Formula won't run** | Incorrect syntax or missing selection. | Ensure the formula is wrapped in `{=...}` and you have selected text if using `selection`. |
+| **Changes didn't save** | App closed before debounce. | Wait at least 2 seconds after typing before closing the application. |
+| **About info is wrong** | Cache issue. | Restart the application to reload version metadata. |
 
-## 3. Automation Tools
-
-This is where ContextPad transforms from a text editor into a workflow engine.
-
-### 📋 Templates
-Templates are reusable text blocks for standardizing your work (e.g., "System Prompts", "Bug Reports", "Email Signatures").
-
-1.  **Access**: Open the Right Sidebar and click the **Templates** icon (File).
-2.  **Variables**: Use `{{variable_name}}` syntax in your template.
-    *   *Example*: `Hello {{name}}, welcome to {{company}}.`
-    *   **Action**: When inserting this template, ContextPad will automatically prompt you to fill in "name" and "company".
-3.  **Usage**: use CTRL + SPACE / CTRL + RIGHT CLICK (command pallette), or Templates Menu > select your template OR Template Manager Sidebar
-
-### ⚡ Actions (Buttons & Commands)
-Actions allow you to manipulate text programmatically.
-
-#### Types of Actions
-*   **Button**: Saves the action to your sidebar for repeated use.
-*   **Command**: A one-time execution (useful for quick transformations).
-
-#### Engine 1: Formulas (Excel-Like)
-Perfect for simple text cleanups.
-*   **Syntax**: `FUNCTION(input)`
-*   **Default Input**: If you use empty parentheses `()`, the formula applies to your **selected text**.
-*   **Examples**:
-    *   `UPPER()`: Converts selection to UPPERCASE.
-    *   `LOWER()`: Converts selection to lowercase.
-    *   `TRIM()`: Removes excess whitespace.
-    *   `JOIN(", ")`: Joins selected lines with a comma.
-
-#### Engine 2: JavaScript (Advanced)
-Full programmatic control using the sandboxed `helpers` API.
-*   **API Available**:
-    *   `helpers.getSelection()`: Returns selected text.
-    *   `helpers.replaceSelection(text)`: Replaces selection with new text.
-    *   `helpers.insertAtCursor(text)`: Inserts text at current position.
-    *   `helpers.getAllText()`: Gets entire document content.
-    *   `helpers.insertTemplate(templateStr)`: Inserts a string and processes any `{{variables}}` inside it.
-
-*   **Example Script (Wrap in Quotes)**:
-    ```javascript
-    const text = helpers.getSelection();
-    helpers.replaceSelection('"' + text + '"');
-    ```
-
----
-
-## 4. Settings & AI Tools
-
-### 🤖 Token Estimator
-Track the "cost" of your text before sending it to an AI.
-1.  **Open Settings**: Click the **Settings** gear in the Right Sidebar.
-2.  **Token Provider**: Choose between:
-    *   **Local (Offline)**: Uses `tiktoken` (GPT-4o compatible). Free and fast.
-    *   **Online**: Connects to Anthropic or Google APIs for exact counts (requires API Keys, both keys are free for token calculations, anthropic does need some billing information upfront).
-3.  **API Keys**: Keys are stored securely in your OS Keychain (not in the file system).
-4.  **Real-Time**: The status bar shows the current token count and estimated cost based on the selected model.
-
-### ✍️ Editor Settings
-Customize the writing experience.
-*   **Appearance**: Change Font Family, Font Size, and Theme (VS Code Dark+ is default).
-*   **Behavior**:
-    *   **Word Wrap**: Toggle on/off for long lines.
-    *   **Line Numbers**: Show/Hide gutter numbers.
-    *   **Paste Formatting**: Choose whether to preserve styles on paste.
-
-### 🧠 Intelligence
-*   **Autocomplete**: Suggests words based on the current document's content.
-    *   *Scope*: "Global" (all open tabs) or "Local" (current file).
-*   **Spell Check**: Integrated spell checker.
-    *   *Dictionaries*: Add custom words to your local dictionary to stop red squiggles on jargon.
+## Limitations
+- **File Types:** Only plain-text files (Markdown, TXT, JSON, etc.) are supported.
+- **Exporting:** Currently supports raw Markdown saving; Rich Text/HTML export is planned for future releases.
+- **External Scripts:** No support for running shell scripts or system commands for security reasons.
+- **History:** Undo history is currently preserved per-session, not per-tab across restarts.

@@ -198,7 +198,7 @@ export function Breadcrumb() {
         </div>
       )}
 
-      <div className={styles.breadcrumbBar}>
+      <div ref={breadcrumbRef} className={styles.breadcrumbBar}>
         {/* Root Workspace Segment */}
         <div 
           ref={el => segmentRefs.current['seg--1'] = el}

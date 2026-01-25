@@ -1,0 +1,517 @@
+/* Shared Styles for Sidebar Managers */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 8px;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--vscode-border);
+  align-items: center;
+}
+
+.toolbarButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--vscode-border);
+  color: var(--vscode-fg);
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+  height: 24px;
+}
+
+.toolbarButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--vscode-fg);
+}
+
+.toolbarButton.active {
+  background: rgba(76, 201, 240, 0.15);
+  border-color: #4cc9f0;
+  color: #4cc9f0;
+}
+
+.bulkCount {
+  font-size: 11px;
+  color: #4cc9f0;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* Forms */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--vscode-border);
+  border-radius: 4px;
+}
+
+.input, .textarea, .select {
+  background: #1e1e1e;
+  border: 1px solid var(--vscode-border);
+  color: var(--vscode-fg);
+  padding: 8px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.textarea {
+  resize: vertical;
+  font-family: 'Consolas', 'Monaco', monospace;
+  line-height: 1.5;
+}
+
+.formButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.primaryButton, .secondaryButton {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.primaryButton {
+  background: #0e639c;
+  color: white;
+}
+
+.primaryButton:hover {
+  background: #1177bb;
+}
+
+.secondaryButton {
+  background: transparent;
+  color: var(--vscode-fg);
+  border: 1px solid var(--vscode-border);
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* List */
+.list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #858585;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.emptyState p {
+  margin: 8px 0;
+}
+
+.emptyHint {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Category Grouping */
+.categoryGroup {
+  margin-bottom: 4px;
+}
+
+.categoryHeader {
+  padding: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #858585;
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  transition: background 0.1s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.categoryTitleArea {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.categoryActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+  margin-left: auto;
+}
+
+.categoryHeader:hover .categoryActions .actionButton {
+  opacity: 1;
+}
+
+.categoryActions .actionButton {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.categoryCount {
+  font-size: 10px;
+  opacity: 0.7;
+  font-weight: normal;
+  min-width: 16px;
+  text-align: right;
+}
+
+/* Items */
+.item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 8px;
+  cursor: default;
+  transition: background 0.1s;
+  border-bottom: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.itemHidden {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 8px;
+  opacity: 0.5;
+  border-radius: 4px;
+}
+
+.selectionCheckbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.itemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  color: #4fc3f7;
+  flex-shrink: 0;
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--vscode-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemPreview {
+  font-size: 10px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.itemActions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.item:hover .itemActions,
+.itemHidden:hover .itemActions {
+  opacity: 1;
+}
+
+.hiddenBadge {
+  font-size: 9px;
+  color: #858585;
+  border: 1px solid #454545;
+  padding: 0 4px;
+  border-radius: 2px;
+  margin-left: 6px;
+  display: inline-block;
+}
+
+/* Action Buttons */
+.actionButton {
+  background: transparent;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.actionButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--vscode-fg);
+}
+
+.playButton {
+  composes: actionButton;
+  color: #4ec9b0;
+}
+
+.playButton:hover {
+  background: rgba(78, 201, 176, 0.15);
+  color: #64e3c6;
+}
+
+.deleteButton {
+  composes: actionButton;
+}
+
+.deleteButton:hover {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+/* Specific component styles */
+.separator {
+  height: 1px;
+  background: var(--vscode-border);
+  margin: 12px 0;
+}
+
+.quickAddSection {
+  margin-bottom: 12px;
+}
+
+.quickAddLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #4ec9b0;
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Icon Picker */
+.iconSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.iconOption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #858585;
+  transition: all 0.15s;
+}
+
+.iconOption:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--vscode-fg);
+}
+
+.iconSelected {
+  background: rgba(0, 122, 204, 0.2);
+  border-color: #007acc;
+  color: #4fc3f7;
+}
+
+/* Code Type Selector */
+.codeTypeSelector {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.codeTypeBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--vscode-border);
+  color: #858585;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.codeTypeBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--vscode-fg);
+}
+
+.codeTypeBtn.active {
+  background: rgba(14, 99, 156, 0.3);
+  border-color: #007acc;
+  color: #ffffff;
+}
+
+/* Formula Builder */
+.formulaBuilder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 4px;
+}
+
+.functionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.functionExample {
+  font-size: 11px;
+  color: #858585;
+}
+
+.functionExample code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Consolas', monospace;
+  color: #10b981;
+}
+
+.inputSourceSelector {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--vscode-fg);
+}
+
+.inputSourceSelector label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.inputSourceSelector input[type="radio"] {
+  accent-color: #10b981;
+}
+
+.applyFormulaBtn {
+  padding: 8px 12px;
+  background: #10b981;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: 'Consolas', monospace;
+}
+
+.applyFormulaBtn:hover {
+  background: #059669;
+}
+
+.formulaPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.previewLabel {
+  font-size: 10px;
+  color: #858585;
+  text-transform: uppercase;
+}
+
+.previewCode {
+  font-family: 'Consolas', monospace;
+  font-size: 12px;
+  color: #10b981;
+  word-break: break-all;
+}

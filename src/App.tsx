@@ -11,6 +11,8 @@ import { useTabStore } from './store/tabStore'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useCodeBlockDetection } from './hooks/useCodeBlockDetection'
 import { useFileWatcher } from './hooks/useFileWatcher'
+import { useFileDrop } from './hooks/useFileDrop'
+import { useStartupFiles } from './hooks/useStartupFiles'
 import { GlobalErrorHandler } from './components/GlobalErrorHandler'
 import styles from './App.module.css'
 
@@ -30,6 +32,12 @@ export default function App() {
 
   // Enable file watchers for external changes
   useFileWatcher()
+
+  // Enable drag-and-drop
+  useFileDrop()
+
+  // Initialize startup files handler (Open With...)
+  useStartupFiles()
 
   // Initialize storage on mount
   useEffect(() => {

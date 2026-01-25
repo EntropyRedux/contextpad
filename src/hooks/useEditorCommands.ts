@@ -1,5 +1,6 @@
 import { useTabStore } from '../store/tabStore'
 import { undo as cmUndo, redo as cmRedo } from '@codemirror/commands'
+import { lockAllBlocks, unlockAllBlocks, toggleBlockLock } from '../utils/lockManager'
 
 export function useEditorCommands() {
   const getActiveTab = useTabStore(state => state.getActiveTab)
@@ -71,6 +72,21 @@ export function useEditorCommands() {
     }
   }
 
+  const lockAll = () => {
+    const activeTab = getActiveTab()
+    if (activeTab?.editorView) lockAllBlocks(activeTab.editorView)
+  }
+
+  const unlockAll = () => {
+    const activeTab = getActiveTab()
+    if (activeTab?.editorView) unlockAllBlocks(activeTab.editorView)
+  }
+
+  const toggleLock = () => {
+    const activeTab = getActiveTab()
+    if (activeTab?.editorView) toggleBlockLock(activeTab.editorView)
+  }
+
   return {
     undo,
     redo,
@@ -78,5 +94,8 @@ export function useEditorCommands() {
     copy,
     paste,
     selectAll,
+    lockAll,
+    unlockAll,
+    toggleLock
   }
 }

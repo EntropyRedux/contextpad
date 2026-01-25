@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useFileOperations } from '../../hooks/useFileOperations'
 import { useEditorCommands } from '../../hooks/useEditorCommands'
 import { useViewCommands } from '../../hooks/useViewCommands'
+import { useWindowDrag } from '../../hooks/useWindowDrag'
 import { useTabStore } from '../../store/tabStore'
 import { useNotificationStore } from '../../store/notificationStore'
 import { useTemplateStore } from '../../store/templateStore'
@@ -11,9 +12,9 @@ import { processTemplateVariables } from '../../utils/templateVariables'
 import {
   FilePlus, File, FolderOpen, Save, SaveAll, LogOut,
   Undo, Redo, Scissors, Copy, Clipboard, Search,
-  PanelLeft, PanelBottom, ListOrdered, MoreHorizontal,
+  PanelLeft, PanelBottom, PanelRight, ListOrdered, MoreHorizontal,
   ZoomIn, ZoomOut, Maximize, FileText, Zap, Settings, Info, RefreshCw,
-  Calculator
+  Calculator, Star
 } from 'lucide-react'
 import { executeAllFormulas } from '../../extensions/inlineFormulas'
 import styles from './MenuBar.module.css'
@@ -22,16 +23,22 @@ export function MenuBar() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const { newFile, openFile, saveFile, saveFileAs, openRecentFile, openFolder } = useFileOperations()
-  const { undo, redo, cut, copy, paste } = useEditorCommands()
-  const { toggleStatusBar, toggleLineNumbers, toggleBreadcrumb, zoomIn, zoomOut, resetZoom, toggleBracketMatching, toggleFoldGutter, toggleAutoIndent } = useViewCommands()
-  const { recentFiles, clearRecentFiles, toggleRightSidebar, toggleLeftSidebar, setSidebarView, getActiveTab, showRightSidebar } = useTabStore()
-  const { getVisibleTemplates } = useTemplateStore()
-  const { getEnabledActions } = useActionStore()
+  const { undo, redo, cut, copy, paste, lockAll, unlockAll, toggleLock } = useEditorCommands()
+  const { toggleStatusBar, toggleLineNumbers, toggleBreadcrumb, toggleActivityBar, zoomIn, zoomOut, resetZoom, toggleBracketMatching, toggleFoldGutter, toggleAutoIndent, toggleCodeBlockMarkers } = useViewCommands()
+  const { recentFiles, clearRecentFiles, toggleRightSidebar, toggleLeftSidebar, setSidebarView, getActiveTab, showRightSidebar, viewSettings } = useTabStore()
+  
+  // Stores for Pinned Items
+  const { templates, isTemplatePinned } = useTemplateStore()
+  const { actions, isActionPinned } = useActionStore()
+  
   const addNotification = useNotificationStore(state => state.addNotification)
+  const { handleMouseDown: handleWindowDrag } = useWindowDrag()
 
   const activeTab = getActiveTab()
-  const visibleTemplates = getVisibleTemplates().slice(0, 5)
-  const enabledActions = getEnabledActions().slice(0, 5)
+
+  // Filter Pinned Items
+  const pinnedTemplates = templates.filter(t => isTemplatePinned(t.id) && !t.isHidden)
+  const pinnedActions = actions.filter(a => isActionPinned(a.id) && a.enabled)
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -185,6 +192,19 @@ export function MenuBar() {
               Redo <span className={styles.shortcut}>Ctrl+Y</span>
             </button>
             <div className={styles.separator} />
+            <button onClick={() => handleMenuItemClick(lockAll)}>
+              <Zap size={14} className={styles.menuIcon} />
+              Lock All Blocks <span className={styles.shortcut}>Ctrl+Shift+L</span>
+            </button>
+            <button onClick={() => handleMenuItemClick(unlockAll)}>
+              <LogOut size={14} className={styles.menuIcon} style={{transform: 'rotate(90deg)'}} />
+              Unlock All Blocks <span className={styles.shortcut}>Ctrl+Shift+U</span>
+            </button>
+            <button onClick={() => handleMenuItemClick(toggleLock)}>
+              <Zap size={14} className={styles.menuIcon} />
+              Toggle Block Lock <span className={styles.shortcut}>Ctrl+L</span>
+            </button>
+            <div className={styles.separator} />
             <button onClick={() => handleOpenSearch('find')}>
               <Search size={14} className={styles.menuIcon} />
               Find & Replace <span className={styles.shortcut}>Ctrl+F</span>
@@ -224,6 +244,10 @@ export function MenuBar() {
               <PanelLeft size={14} className={styles.menuIcon} />
               Toggle Outline <span className={styles.shortcut}>Ctrl+B</span>
             </button>
+            <button onClick={() => handleMenuItemClick(toggleCodeBlockMarkers)}>
+              <Star size={14} className={styles.menuIcon} fill={viewSettings.showCodeBlockMarkers ? 'currentColor' : 'none'} />
+              Toggle Block Markers <span className={styles.shortcut}>Ctrl+Shift+M</span>
+            </button>
             <button onClick={() => handleMenuItemClick(toggleStatusBar)}>
               <PanelBottom size={14} className={styles.menuIcon} />
               Toggle Status Bar
@@ -235,6 +259,10 @@ export function MenuBar() {
             <button onClick={() => handleMenuItemClick(toggleBreadcrumb)}>
               <MoreHorizontal size={14} className={styles.menuIcon} />
               Toggle Breadcrumb
+            </button>
+            <button onClick={() => handleMenuItemClick(toggleActivityBar)}>
+              <PanelRight size={14} className={styles.menuIcon} />
+              Toggle Activity Bar
             </button>
             <div className={styles.separator} />
             <button onClick={() => handleMenuItemClick(zoomIn)}>
@@ -266,13 +294,13 @@ export function MenuBar() {
               <FileText size={14} className={styles.menuIcon} />
               Template Manager
             </button>
-            {visibleTemplates.length > 0 && (
+            {pinnedTemplates.length > 0 && (
               <>
                 <div className={styles.separator} />
-                <div className={styles.submenuLabel}>Quick Templates</div>
-                {visibleTemplates.map(t => (
+                <div className={styles.submenuLabel}>Pinned Templates</div>
+                {pinnedTemplates.map(t => (
                   <button key={t.id} onClick={() => handleInsertTemplate(t.content)}>
-                    <FileText size={12} className={styles.menuIcon} />
+                    <Star size={12} className={styles.menuIcon} fill="orange" stroke="none" />
                     {t.name}
                   </button>
                 ))}
@@ -295,13 +323,13 @@ export function MenuBar() {
               <Zap size={14} className={styles.menuIcon} />
               Action Manager
             </button>
-            {enabledActions.length > 0 && (
+            {pinnedActions.length > 0 && (
               <>
                 <div className={styles.separator} />
-                <div className={styles.submenuLabel}>Quick Actions</div>
-                {enabledActions.map(a => (
+                <div className={styles.submenuLabel}>Pinned Actions</div>
+                {pinnedActions.map(a => (
                   <button key={a.id} onClick={() => handleRunAction(a.code)}>
-                    <Zap size={12} className={styles.menuIcon} />
+                    <Star size={12} className={styles.menuIcon} fill="orange" stroke="none" />
                     {a.name}
                   </button>
                 ))}
@@ -328,7 +356,8 @@ export function MenuBar() {
             <button onClick={() => handleMenuItemClick(() => addNotification({
               type: 'info',
               message: 'About ContextPad',
-                                details: 'ContextPad v1.3.2\n\nA professional Markdown editor optimized for prompt engineering and technical documentation.\n\nKey Features:\n- Context-aware snippets\n- Programmable Actions\n- Real-time Token & Cost Estimation\n- Smart Code Block Linting\n\nCreated by entropy_redux\nLicense: GPL-3.0',              duration: 8000
+              details: 'ContextPad v1.5.0\n\nA professional workspace designed to live between thinking and execution. Optimized for prompt engineering, technical drafting, and workflow automation.\n\nKey Features:\n- Advanced Action & Formula Engine\n- Dynamic Template Variables\n- Real-time Token & Cost Estimation\n- Smart Code Block Locking & Forms\n- Workspace-aware Navigation\n\nGitHub: https://github.com/EntropyRedux/contextpad\nCreated by entropy_redux\nLicense: GPL-3.0',
+              duration: 10000
             }))}>
               <Info size={14} className={styles.menuIcon} />
               About
@@ -338,7 +367,7 @@ export function MenuBar() {
       </div>
 
       {/* Draggable region for window movement */}
-      <div className={styles.dragRegion} data-tauri-drag-region />
+      <div className={styles.dragRegion} onMouseDown={handleWindowDrag} />
     </div>
   )
 }

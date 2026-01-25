@@ -1,12 +1,13 @@
 /**
  * Action executor for safely running user-defined JavaScript or Formulas
- * Based on monolithic implementation (lines 3173-3184)
  */
 
 import { validateActionCode } from './codeValidator'
 import { processTemplateVariables } from './templateVariables'
 import { executeFormula, validateFormula, setEditorContext, type EditorContext } from '../services/formulaParser'
 import type { EditorView } from '@codemirror/view'
+import { detectCodeBlocks } from './codeBlockDetection'
+import { getParamAsString } from './codeBlockParams'
 
 export interface ExecutionResult {
   success: boolean
@@ -15,34 +16,24 @@ export interface ExecutionResult {
 
 /**
  * Execute action code in a sandboxed environment
- * Supports both JavaScript and Formula (FORMULA: prefix)
- * Provides access to editor helpers - no window, document, or file system
  */
 export function executeAction(
   code: string,
-  editorView: EditorView
+  editorView: EditorView,
+  actionId?: string // Optional ID of the action being executed
 ): ExecutionResult {
   try {
-    // Check if this is a formula (has FORMULA: prefix)
     if (code.startsWith('FORMULA:')) {
       return executeFormulaAction(code.slice(8), editorView)
     }
 
-    // JavaScript execution
-    // Validate code before execution
     const validation = validateActionCode(code)
     if (!validation.valid) {
       throw new Error(`Code validation failed: ${validation.errors.join(', ')}`)
     }
 
-    // Create helper functions for common operations
-    const helpers = getEditorHelpers(editorView)
-
-    // Create sandboxed function with editor helpers
-    // Security note: Code validation happens in validateActionCode()
+    const helpers = getEditorHelpers(editorView, actionId)
     const fn = new Function('editor', 'helpers', code)
-
-    // Execute with helpers object for easier API
     fn(editorView, helpers)
 
     return { success: true }
@@ -62,17 +53,13 @@ function executeFormulaAction(
   editorView: EditorView
 ): ExecutionResult {
   try {
-    // Validate formula
     const validation = validateFormula(formula)
     if (!validation.valid) {
       throw new Error(`Formula validation failed: ${validation.error}`)
     }
 
-    // Get current selection
     const selection = editorView.state.selection.main
     const selectedText = editorView.state.doc.sliceString(selection.from, selection.to)
-
-    // Set up editor context for position-based functions
     const pos = selection.head
     const line = editorView.state.doc.lineAt(pos)
     const doc = editorView.state.doc
@@ -99,25 +86,19 @@ function executeFormulaAction(
     }
 
     setEditorContext(context)
-
-    // Execute the formula
     const result = executeFormula(formula, selectedText)
-
     setEditorContext(null)
 
     if (!result.success) {
       throw new Error(result.error || 'Formula execution failed')
     }
 
-    // Replace selection with result (or insert at cursor if no selection)
     if (selection.from !== selection.to) {
-      // Has selection - replace it
       editorView.dispatch({
         changes: { from: selection.from, to: selection.to, insert: result.value || '' },
         selection: { anchor: selection.from + (result.value?.length || 0) }
       })
     } else {
-      // No selection - insert at cursor
       editorView.dispatch({
         changes: { from: pos, insert: result.value || '' },
         selection: { anchor: pos + (result.value?.length || 0) }
@@ -135,14 +116,61 @@ function executeFormulaAction(
 
 /**
  * Get editor helper object for common operations
- * This provides a simpler API for action code
+ * Automatically filters out content from blocks that exclude this actionId
  */
-export function getEditorHelpers(view: EditorView) {
+export function getEditorHelpers(view: EditorView, actionId?: string) {
+  // Helper to get text with excluded blocks redacted
+  const getFilteredText = () => {
+    const docText = view.state.doc.toString()
+    
+    if (!actionId) return docText
+
+    const blocks = detectCodeBlocks(docText)
+    let filteredText = docText
+    
+    console.log(`[ActionExecutor] Filtering for action: ${actionId}`)
+
+    // Iterate blocks in reverse to simplify index handling (though we are replacing ranges)
+    // Actually, we should build a new string or array of parts.
+    // Easier: Replace excluded blocks with empty lines to preserve line counts for other ops.
+    
+    // Iterate blocks in reverse to preserve indices for replacement
+    const reversedBlocks = [...blocks].reverse()
+    
+    for (const block of reversedBlocks) {
+      const excludeParam = getParamAsString(block.parameters, 'exclude', '')
+      const exclusions = excludeParam.split(',').map(s => s.trim())
+      
+      console.log(`[ActionExecutor] Checking block lines ${block.startLine}-${block.endLine}. Exclusions:`, exclusions)
+
+      // Check for 'action:ID' exclusion
+      const isExcluded = exclusions.some(ex => ex === `action:${actionId}`)
+      
+      if (isExcluded) {
+        console.log(`[ActionExecutor] Excluding block!`)
+        // Redact content while preserving indices and line numbers
+        // We replace characters with spaces but keep newlines
+        const from = startLine.from
+        const to = endLine.to
+        
+        const originalContent = filteredText.substring(from, to)
+        const redactedContent = originalContent.replace(/[^\n]/g, ' ')
+        
+        filteredText = filteredText.substring(0, from) + redactedContent + filteredText.substring(to)
+      }
+    }
+    
+    return filteredText
+  }
+
   return {
     // Selection operations
     getSelection: () => {
       const selection = view.state.selection.main
-      return view.state.doc.sliceString(selection.from, selection.to)
+      if (selection.empty) return ''
+      
+      const fullText = getFilteredText()
+      return fullText.slice(selection.from, selection.to)
     },
 
     replaceSelection: (text: string) => {
@@ -162,7 +190,19 @@ export function getEditorHelpers(view: EditorView) {
 
     // Document operations
     getAllText: () => {
-      return view.state.doc.toString()
+      return getFilteredText()
+    },
+    
+    getLine: (lineNumber: number) => {
+      const text = getFilteredText()
+      const lines = text.split('\n')
+      // 1-based index
+      if (lineNumber < 1 || lineNumber > lines.length) return ''
+      return lines[lineNumber - 1]
+    },
+    
+    getLines: () => {
+      return getFilteredText().split('\n')
     },
 
     replaceAllText: (text: string) => {
@@ -199,7 +239,6 @@ export function getEditorHelpers(view: EditorView) {
       const selectedText = view.state.doc.sliceString(selection.from, selection.to)
       const pos = view.state.selection.main.head
 
-      // Process template variables
       const processed = processTemplateVariables(templateContent, selectedText)
 
       view.dispatch({

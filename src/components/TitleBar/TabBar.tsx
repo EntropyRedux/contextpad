@@ -1,10 +1,12 @@
 import { useRef, useState, useEffect } from 'react'
 import { useTabStore, Tab } from '../../store/tabStore'
+import { useWindowDrag } from '../../hooks/useWindowDrag'
 import { Plus, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import styles from './TabBar.module.css'
 
 export function TabBar() {
   const { tabs, activeTabId, setActiveTab, removeTab, addTab, reorderTabs } = useTabStore()
+  const { handleMouseDown: handleWindowDrag } = useWindowDrag()
   const tabContainerRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(false)
@@ -166,6 +168,9 @@ export function TabBar() {
         </button>
       )}
 
+      {/* Draggable empty space - fills remaining area */}
+      <div className={styles.dragSpacer} onMouseDown={handleWindowDrag} />
+
       <button
         className={styles.addTabBtn}
         onClick={() => addTab()}
@@ -173,9 +178,6 @@ export function TabBar() {
       >
         <Plus size={16} />
       </button>
-
-      {/* Draggable empty space - fills remaining area */}
-      <div className={styles.dragSpacer} data-tauri-drag-region />
     </div>
   )
 }

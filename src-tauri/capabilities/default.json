@@ -1,11 +1,17 @@
 {
+  "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default permissions for ContextPad",
-  "windows": ["*"],
+  "description": "Default capabilities for ContextPad",
+  "windows": ["main"],
   "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:event:allow-emit",
+    "core:event:allow-listen",
+    "core:window:default",
+    "core:window:allow-set-focus",
+    "core:window:allow-unminimize",
     "core:window:allow-start-dragging",
-    "core:window:allow-maximize",
-    "core:window:allow-minimize",
-    "core:window:allow-close"
+    "deep-link:default"
   ]
 }

@@ -15,6 +15,10 @@ export function useViewCommands() {
     setViewSettings({ showBreadcrumb: !viewSettings.showBreadcrumb })
   }
 
+  const toggleActivityBar = () => {
+    setViewSettings({ showActivityBar: !viewSettings.showActivityBar })
+  }
+
   const FONT_SIZE_PRESETS = [12, 14, 16, 18, 20, 22, 24]
 
   const zoomIn = () => {
@@ -59,10 +63,16 @@ export function useViewCommands() {
     setViewSettings({ enableAutoIndent: !viewSettings.enableAutoIndent })
   }
 
+  const toggleCodeBlockMarkers = () => {
+    setViewSettings({ showCodeBlockMarkers: !viewSettings.showCodeBlockMarkers })
+  }
+
   return {
     toggleStatusBar,
     toggleLineNumbers,
     toggleBreadcrumb,
+    toggleActivityBar,
+    toggleCodeBlockMarkers,
     zoomIn,
     zoomOut,
     resetZoom,

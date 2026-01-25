@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { indexedDBStorage } from '../services/storage/IndexedDBStorage'
+import welcomeContent from '../data/WELCOME.md?raw'
 
 export interface Tab {
   id: string
@@ -11,6 +12,7 @@ export interface Tab {
   language: 'markdown' | string
   lastModifiedTime?: number
   editorView?: unknown // EditorView reference for outline parsing (not persisted)
+  pinnedTabId?: string // If set, this tab is from a pinned workflow and should be locked
 }
 
 export interface CursorInfo {
@@ -18,10 +20,22 @@ export interface CursorInfo {
   column: number
 }
 
+export interface PinnedTab {
+  id: string
+  name: string
+  icon: string  // Lucide icon name
+  content: string
+  category: string
+  isHidden?: boolean
+  createdAt: number
+}
+
 export interface ViewSettings {
   showStatusBar: boolean
   showLineNumbers: boolean
   showBreadcrumb: boolean
+  showActivityBar: boolean
+  showCodeBlockMarkers: boolean
   fontSize: number
   fontFamily: string
   wordWrap: boolean
@@ -74,8 +88,11 @@ interface TabState {
   showRightSidebar: boolean
   showLeftSidebar: boolean
   openFolderPath: string | null
-  sidebarView: 'settings' | 'templates' | 'actions'
+  sidebarView: 'settings' | 'templates' | 'actions' | 'workflows'
   isInitialized: boolean
+  pinnedTabs: PinnedTab[]
+  pinnedCategoryOrder: string[]
+  pinnedCollapsedCategories: string[]
 
   addTab: (tab?: Partial<Tab>) => void
   removeTab: (id: string) => void
@@ -89,9 +106,18 @@ interface TabState {
   clearRecentFiles: () => void
   toggleRightSidebar: () => void
   toggleLeftSidebar: () => void
-  setSidebarView: (view: 'settings' | 'templates' | 'actions') => void
+  setSidebarView: (view: 'settings' | 'templates' | 'actions' | 'workflows') => void
   setOpenFolderPath: (path: string | null) => void
   initializeFromStorage: () => Promise<void>
+  // Pinned tabs functions
+  addPinnedTab: (pin: Omit<PinnedTab, 'id' | 'createdAt'>) => void
+  removePinnedTab: (id: string) => void
+  updatePinnedTab: (id: string, updates: Partial<PinnedTab>) => void
+  reorderPinnedTabs: (fromIndex: number, toIndex: number) => void
+  togglePinnedTabVisibility: (id: string) => void
+  togglePinnedTabsVisibilityBulk: (ids: string[], isHidden: boolean) => void
+  movePinnedTabCategory: (category: string, direction: 'up' | 'down') => void
+  togglePinnedCategoryCollapse: (category: string) => void
 }
 
 // Default view settings
@@ -99,6 +125,8 @@ const defaultViewSettings: ViewSettings = {
   showStatusBar: true,
   showLineNumbers: true,
   showBreadcrumb: true,
+  showActivityBar: true,
+  showCodeBlockMarkers: true,
   fontSize: 14,
   fontFamily: 'Consolas',
   wordWrap: true,
@@ -174,7 +202,10 @@ const saveMetadataToLocalStorage = (state: TabState) => {
       activeTabId: state.activeTabId,
       viewSettings: state.viewSettings,
       recentFiles: state.recentFiles,
-      openFolderPath: state.openFolderPath
+      openFolderPath: state.openFolderPath,
+      pinnedTabs: state.pinnedTabs,
+      pinnedCategoryOrder: state.pinnedCategoryOrder,
+      pinnedCollapsedCategories: state.pinnedCollapsedCategories
     }
     localStorage.setItem('contextpad-tabs-v2', JSON.stringify(metadataToSave))
   } catch (error) {
@@ -211,12 +242,19 @@ const loadMetadataFromLocalStorage = () => {
         indexingScope: 'performance' as const
       }
 
+      // Ensure pinned tabs have categories
+      const pinnedTabs = (parsed.pinnedTabs || []).map((p: any) => ({
+        ...p,
+        category: p.category || 'General'
+      }))
+
       return {
         tabs: parsed.tabs || [],
         activeTabId: parsed.activeTabId || null,
         viewSettings: safeViewSettings,
         recentFiles: parsed.recentFiles || [],
-        openFolderPath: parsed.openFolderPath || null
+        openFolderPath: parsed.openFolderPath || null,
+        pinnedTabs
       }
     }
   } catch (error) {
@@ -224,6 +262,18 @@ const loadMetadataFromLocalStorage = () => {
   }
   return null
 }
+
+// Default Pinned Tabs (Workflows)
+const defaultPinnedTabs: PinnedTab[] = [
+  {
+    id: 'welcome-workflow',
+    name: 'Welcome Guide',
+    icon: 'BookOpen',
+    content: welcomeContent,
+    category: 'Help',
+    createdAt: Date.now()
+  }
+]
 
 const persistedMetadata = loadMetadataFromLocalStorage()
 
@@ -238,6 +288,9 @@ export const useTabStore = create<TabState>((set, get) => ({
   openFolderPath: persistedMetadata?.openFolderPath || null,
   sidebarView: 'settings',
   isInitialized: false,
+  pinnedTabs: persistedMetadata?.pinnedTabs || defaultPinnedTabs,
+  pinnedCategoryOrder: (persistedMetadata as any)?.pinnedCategoryOrder || [],
+  pinnedCollapsedCategories: (persistedMetadata as any)?.pinnedCollapsedCategories || [],
 
   // Initialize and load content from IndexedDB
   initializeFromStorage: async () => {
@@ -256,8 +309,37 @@ export const useTabStore = create<TabState>((set, get) => ({
         })
       )
 
+      let finalTabs = tabsWithContent
+      let finalActiveId = state.activeTabId
+
+      // First Run Logic: If no tabs exist, open the Welcome Workflow
+      if (finalTabs.length === 0) {
+        // Find the welcome workflow in pinned tabs
+        const welcomeWorkflow = state.pinnedTabs.find(p => p.id === 'welcome-workflow')
+        
+        if (welcomeWorkflow) {
+          const welcomeTab: Tab = {
+            id: crypto.randomUUID(),
+            title: welcomeWorkflow.name,
+            content: welcomeWorkflow.content,
+            filePath: null,
+            folderPath: null,
+            isDirty: false,
+            language: 'markdown',
+            pinnedTabId: welcomeWorkflow.id
+          }
+          finalTabs = [welcomeTab]
+          finalActiveId = welcomeTab.id
+          
+          // Persist immediately
+          saveMetadataToLocalStorage({ ...state, tabs: finalTabs, activeTabId: finalActiveId })
+          saveTabContentDebounced(welcomeTab.id, welcomeTab.content)
+        }
+      }
+
       set({
-        tabs: tabsWithContent,
+        tabs: finalTabs,
+        activeTabId: finalActiveId,
         isInitialized: true
       })
     } catch (error) {
@@ -411,6 +493,119 @@ export const useTabStore = create<TabState>((set, get) => ({
       const newState = { ...state, openFolderPath: path }
       saveMetadataToLocalStorage(newState)
       return { openFolderPath: path }
+    })
+  },
+
+  // Pinned tabs functions
+  addPinnedTab: (pin) => {
+    const newPin: PinnedTab = {
+      id: crypto.randomUUID(),
+      name: pin.name,
+      icon: pin.icon,
+      content: pin.content,
+      category: pin.category || 'General',
+      createdAt: Date.now()
+    }
+
+    set((state) => {
+      const pinnedTabs = [...state.pinnedTabs, newPin]
+      const newState = { ...state, pinnedTabs }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedTabs }
+    })
+  },
+
+  removePinnedTab: (id) => {
+    set((state) => {
+      const pinnedTabs = state.pinnedTabs.filter(p => p.id !== id)
+      const newState = { ...state, pinnedTabs }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedTabs }
+    })
+  },
+
+  updatePinnedTab: (id, updates) => {
+    set((state) => {
+      const pinnedTabs = state.pinnedTabs.map(p =>
+        p.id === id ? { ...p, ...updates } : p
+      )
+      const newState = { ...state, pinnedTabs }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedTabs }
+    })
+  },
+
+  reorderPinnedTabs: (fromIndex, toIndex) => {
+    set((state) => {
+      const newPins = [...state.pinnedTabs]
+      const [movedPin] = newPins.splice(fromIndex, 1)
+      newPins.splice(toIndex, 0, movedPin)
+      const newState = { ...state, pinnedTabs: newPins }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedTabs: newPins }
+    })
+  },
+
+  togglePinnedTabVisibility: (id) => {
+    set((state) => {
+      const pinnedTabs = state.pinnedTabs.map(p =>
+        p.id === id ? { ...p, isHidden: !p.isHidden } : p
+      )
+      const newState = { ...state, pinnedTabs }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedTabs }
+    })
+  },
+
+  togglePinnedTabsVisibilityBulk: (ids, isHidden) => {
+    set((state) => {
+      const idSet = new Set(ids)
+      const pinnedTabs = state.pinnedTabs.map(p =>
+        idSet.has(p.id) ? { ...p, isHidden } : p
+      )
+      const newState = { ...state, pinnedTabs }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedTabs }
+    })
+  },
+
+  movePinnedTabCategory: (category, direction) => {
+    set((state) => {
+      const categories = Array.from(new Set(state.pinnedTabs.map(p => p.category || 'General'))).sort()
+      let order = state.pinnedCategoryOrder.length > 0 ? [...state.pinnedCategoryOrder] : [...categories]
+      
+      categories.forEach(c => {
+        if (!order.includes(c)) order.push(c)
+      })
+      
+      const index = order.indexOf(category)
+      if (index === -1) return {}
+
+      const newOrder = [...order]
+      if (direction === 'up' && index > 0) {
+        [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]]
+      } else if (direction === 'down' && index < newOrder.length - 1) {
+        [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]]
+      }
+
+      const newState = { ...state, pinnedCategoryOrder: newOrder }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedCategoryOrder: newOrder }
+    })
+  },
+
+  togglePinnedCategoryCollapse: (category) => {
+    set((state) => {
+      const current = new Set(state.pinnedCollapsedCategories)
+      if (current.has(category)) {
+        current.delete(category)
+      } else {
+        current.add(category)
+      }
+      const newCollapsed = Array.from(current)
+      const newState = { ...state, pinnedCollapsedCategories: newCollapsed }
+      saveMetadataToLocalStorage(newState)
+      return { pinnedCollapsedCategories: newCollapsed }
     })
   }
 }))

@@ -1,17 +1,18 @@
 /**
  * Code block parameter detection utility
  *
- * Detects parameters in markdown code blocks (e.g., ```language param1 param2)
- * This is detection only - no actions are taken yet.
- *
- * Future plans: This will be used for workflow automation and template actions.
+ * Detects parameters in markdown code blocks (e.g., ```language {param=value})
+ * 
+ * REFACTORED: Now uses the robust parser from codeBlockParams.ts
  */
+
+import { extractCodeBlockInfo, CodeBlockParams } from './codeBlockParams'
 
 export interface CodeBlockInfo {
   startLine: number
   endLine: number
   language: string
-  parameters: string[]
+  parameters: CodeBlockParams // Updated to use structured params
   content: string
 }
 
@@ -19,7 +20,8 @@ export interface CodeBlockInfo {
  * Detects all code blocks with parameters in the given markdown content
  */
 export function detectCodeBlocks(content: string): CodeBlockInfo[] {
-  const lines = content.split('\n')
+  // Normalize line endings
+  const lines = content.replace(/\r\n/g, '\n').split('\n')
   const codeBlocks: CodeBlockInfo[] = []
   let currentBlock: Partial<CodeBlockInfo> | null = null
 
@@ -27,31 +29,33 @@ export function detectCodeBlocks(content: string): CodeBlockInfo[] {
     const line = lines[i]
     const trimmedLine = line.trim()
 
-    // Check for code block start
-    if (trimmedLine.startsWith('```')) {
-      if (!currentBlock) {
-        // Start of a new code block
-        const metadata = trimmedLine.slice(3).trim()
-        const parts = metadata.split(/\s+/).filter(p => p.length > 0)
+    // Check for code block start: ``` or ~~~
+    const startMatch = trimmedLine.match(/^(`{3,}|~{3,})(.*)$/)
 
-        currentBlock = {
-          startLine: i + 1, // 1-indexed
-          language: parts[0] || '',
-          parameters: parts.slice(1),
-          content: ''
-        }
-      } else {
-        // End of current code block
+    if (startMatch && !currentBlock) {
+      // Start of a new code block
+      const infoString = startMatch[2].trim()
+      const parsed = extractCodeBlockInfo(infoString)
+
+      currentBlock = {
+        startLine: i + 1, // 1-indexed
+        language: parsed.language,
+        parameters: parsed.params,
+        content: ''
+      }
+    } else if (currentBlock) {
+      // Check for code block end (must start with same fence char, ideally we track fence length but simplifying for now)
+      if (trimmedLine.startsWith('```') || trimmedLine.startsWith('~~~')) {
         currentBlock.endLine = i + 1 // 1-indexed
         codeBlocks.push(currentBlock as CodeBlockInfo)
         currentBlock = null
-      }
-    } else if (currentBlock) {
-      // Inside a code block, accumulate content
-      if (currentBlock.content) {
-        currentBlock.content += '\n' + line
       } else {
-        currentBlock.content = line
+        // Inside a code block, accumulate content
+        if (currentBlock.content) {
+          currentBlock.content += '\n' + line
+        } else {
+          currentBlock.content = line
+        }
       }
     }
   }
@@ -69,7 +73,7 @@ export function detectCodeBlocks(content: string): CodeBlockInfo[] {
  * Gets code blocks that have at least one parameter
  */
 export function getCodeBlocksWithParameters(content: string): CodeBlockInfo[] {
-  return detectCodeBlocks(content).filter(block => block.parameters.length > 0)
+  return detectCodeBlocks(content).filter(block => Object.keys(block.parameters).length > 0)
 }
 
 /**

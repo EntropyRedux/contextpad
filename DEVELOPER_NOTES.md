@@ -1,111 +1,44 @@
 # Developer Notes
 
-**Application:** ContextPad
-**Version:** 1.3.3
-**Framework:** Tauri 2.x + React 18 + CodeMirror 6
+## Last updated since
+January 25, 2026
 
----
+## High-Level Architecture
+ContextPad is a Tauri-based desktop app using a React/Zustand frontend and a Rust backend.
+- **Frontend:** Handles UI, state management, and the CodeMirror 6 engine.
+- **Backend (Rust):** Manages secure keychain access, file system I/O, and window decorations.
 
-## 1. Architecture Overview
+## Core Concepts
+- **Thinking vs. Execution:** The app is optimized for high-friction drafting, not low-friction engineering (no shell access).
+- **Locked Islands:** A SyntaxTree-based locking system that allows precise "editable holes" (`[[...]]`) within read-only regions.
+- **Action Exclusions:** The ability for logic (JS/Formula) to "ignore" parts of a document based on metadata flags.
 
-ContextPad is a local-first desktop text editor utilizing a hybrid architecture:
-*   **Frontend:** React 18 with Zustand for state management.
-*   **Editor:** CodeMirror 6, customized with extensions for Markdown, formulas, and large-file handling.
-*   **Backend:** Tauri 2.x (Rust) handles file I/O, window management, and secure key storage.
-*   **Persistence:** IndexedDB is used for content storage (Tabs) to bypass `localStorage` quotas, while `localStorage` retains lightweight metadata (Settings, recent files).
+## Data Flow
+User Input → CodeMirror (State) → Zustand (TabStore) → IndexedDB (Persistence).
+Settings → Zustand (SettingsStore) → LocalStorage (Metadata).
+Secrets → Rust Command → OS Keychain.
 
----
+## Key Design Decisions
+- **Zustand over Redux:** Chosen for low boilerplate and performant partial state subscriptions (crucial for a complex editor).
+- **IndexedDB for Content:** Alternative to `localStorage` to bypass the 5MB quota for large drafting sessions.
+- **Compartments (CodeMirror):** Used instead of reconfiguring the whole editor to allow instant theme/font swaps without flickering.
+- **Dual-Click Workflows:** Single-click for navigation vs. Double-click for instantiation balances speed and safety.
 
-## 2. Editor Engine
+## Folder Structure
+- `src/components/Sidebar/shared`: Unifies the UI logic for Actions, Templates, and Workflows.
+- `src/extensions`: Custom CodeMirror logic (Formulas, Locking, Variables).
+- `src/services/storage`: Strategy pattern for persistence (IndexedDB vs LocalStorage).
 
-**Location:** `src/components/Editor/Editor.tsx`
+## Development Setup
+1. `npm install`
+2. `npm run tauri:dev`
+3. Debugging: Use browser devtools for UI and terminal for Rust logs.
 
-The editor is built on CodeMirror 6 and utilizes a "Compartment" system for dynamic reconfiguration.
+## Gotchas
+- **Position Drift:** Do not use index-based positions for code blocks; always use the `syntaxTree` to query `FencedCode` nodes.
+- **Zustand Persistence:** Metadata is saved immediately; content is debounced by 2 seconds. Don't close the app instantly after a large paste.
 
-### Key Implementation Details:
-*   **Compartments:** `fontThemeCompartment`, `colorThemeCompartment`, and `languageCompartment` allow hot-swapping of themes, fonts, and syntax highlighting without destroying the editor instance.
-*   **Large File Mode:** The editor automatically detects large files based on line count (default > 5000 lines). In this mode, resource-intensive features (Bracket Matching, Fold Gutter, AST-based Markdown Highlighting) are disabled to ensure 60fps scrolling performance.
-*   **Extensions Pipeline:** The editor loads a custom extension stack including:
-    *   `slashCommands`: Despite the name, these are explicitly triggered via **`CTRL + SPACE`** (Keyboard) or **`CTRL + RIGHT CLICK`** (Mouse) to avoid friction with normal text entry. They provide an inline palette for actions and templates.
-    *   `templateVariables`: Decorates `{{variable}}` patterns.
-    *   `inlineFormulas`: Detects `{=FORMULA()}` syntax.
-    *   `autocomplete`: Context-aware completion engine.
-
----
-
-## 3. Action & Formula System
-
-**Location:** `src/services/formulaParser.ts`, `src/utils/actionExecutor.ts`
-
-The application supports user-defined logic through two distinct engines.
-
-### Engine A: Formula Parser
-A recursive descent parser for Excel-like syntax.
-*   **Syntax:** `FUNCTION(arg1, arg2)`. Nested calls like `UPPER(TRIM(selection))` are supported.
-*   **Registry:** `FORMULA_FUNCTIONS` maps keywords to JavaScript implementations.
-*   **Context:** Functions can access editor state (Line number, Column) via a global context object.
-
-### Engine B: JavaScript Sandbox
-A restricted execution environment for complex scripts.
-*   **Mechanism:** Uses the `Function` constructor with a limited scope. Direct access to `window` or DOM is restricted.
-*   **Helpers API:** Scripts receive a `helpers` object to interact with the editor:
-    *   `getSelection()` / `replaceSelection(text)`
-    *   `insertAtCursor(text)`
-    *   `insertTemplate(content)` (Invokes the template parser)
-    *   `getAllText()` / `replaceAllText(text)`
-
----
-
-## 4. Token Estimator Service
-
-**Location:** `src/services/tokenEstimator/TokenEstimatorService.ts`
-
-A singleton service managing token counting across multiple providers.
-
-*   **Offline Mode:** Uses `js-tiktoken` (WASM) for local OpenAI model estimation.
-*   **Online Mode:** Connects to Anthropic/Google APIs for proprietary tokenizers.
-*   **Debouncing:** Calculations are debounced (1000ms idle / 5000ms max wait) to prevent API rate limiting.
-*   **Caching:** Results are cached based on `Hash(Content + ModelID)` to deduplicate requests.
-*   **Approximation:** For files exceeding 50,000 characters, the service samples the text and extrapolates the token count to avoid freezing the UI.
-
----
-
-## 5. Navigation & Sidebar
-
-**Location:** `src/components/Breadcrumb/Breadcrumb.tsx`, `src/components/Sidebar/`
-
-### Breadcrumb Navigation
-*   **Logic:** Parses the active file path relative to the workspace root.
-*   **Interaction:** Clicking a segment calls the Rust command `read_directory` to fetch folder contents on-demand, rendering a dropdown portal for navigation.
-
-### Sidebar Tools
-*   **Resizable Pane:** Implements custom drag handlers constrained between 250px and 600px.
-*   **Virtualization:** The File Explorer utilizes virtualized lists to handle large directory structures (e.g., `node_modules`) without DOM overload.
-*   **Template Manager:** Uses the native HTML5 Drag and Drop API for inserting templates into the editor.
-
----
-
-## 6. Intelligence Services
-
-**Location:** `src/services/autocompleteService.ts`, `src/services/spellCheckService.ts`
-
-### Autocomplete
-*   **Dual Source:** Combines hardcoded snippets (`func`, `table`) with dynamic document scanning.
-*   **Windowed Scanning:** Scans only a ±5000 character window around the cursor to find repeated words, ensuring performance in large files.
-*   **Context Awareness:** Detects cursor context (Code Block vs. Markdown) to filter relevant suggestions.
-
-### Spell Check
-*   **Architecture:** Custom linter implementation instead of browser native spellcheck.
-*   **Dictionary:** Loads a 50k word dictionary from `public/Dictionaries/en-US.txt`.
-*   **Lazy Evaluation:** Suggestions are computed only when the user interacts with a flagged word (Levenshtein distance), deferring expensive calculations.
-
-### Code Linting
-*   **Heuristic Validation:** Uses regex and stack-based parsing to validate embedded JSON, YAML, and HTML within Markdown code blocks.
-
----
-
-## 7. Security & Persistence
-
-*   **API Keys:** Stored in the OS Keychain via the `keyring` crate in Rust. Keys are never saved to plain-text files.
-*   **File I/O:** All file operations are gated through Rust commands using `rfd` dialogs for explicit user confirmation.
-*   **State:** The application uses a strictly typed `TabState` interface. `localStorage` is used for preferences, while `IndexedDB` handles content persistence.
+## Future Work
+- **AI Blueprint Export / Transform** Transform/Download documents into highly structured AI agent/chatbot processing documents, e.g. attentionn mechanism, vecor embedding tags, frontmatter
+- **HTML export / Live Preview with Hot Reload:** Implementation preview handled by the default browser and online dependencies
+- **Code Block Parameters:** Expansion of the metadata parser to support more key-value pairs for plugin-like behavior.

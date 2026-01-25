@@ -101,7 +101,7 @@ function getSlashCompletions(): Completion[] {
               changes: { from: from, to: to, insert: '' }
             })
             
-            const result = executeAction(action.code, view)
+            const result = executeAction(action.code, view, action.id)
             if (!result.success) {
               console.error('Action failed:', result.error)
               useNotificationStore.getState().addNotification({

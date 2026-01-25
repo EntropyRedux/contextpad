@@ -6,6 +6,17 @@
   animation: slideIn 0.2s ease-out;
 }
 
+/* Collapsed state - only icon bar visible */
+.sidebarContainer.collapsed {
+  width: auto !important;
+  animation: none;
+  border-left: none;
+}
+
+.sidebarContainer.collapsed .iconBar {
+  border-left: 1px solid #454545;
+}
+
 /* Resize Handle */
 .resizeHandle {
   position: absolute;
@@ -83,6 +94,28 @@
   bottom: 6px;
   width: 2px;
   background: #007acc;
+}
+
+/* Separator between default icons and pinned tabs */
+.iconSeparator {
+  width: 20px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+/* Spacer to push add button to bottom */
+.iconSpacer {
+  flex: 1;
+}
+
+/* Add button styling */
+.addButton {
+  color: #666;
+}
+
+.addButton:hover {
+  color: #4ec9b0;
 }
 
 /* Content Panel (main area) */

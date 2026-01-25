@@ -297,6 +297,55 @@ const FORMULA_FUNCTIONS: Record<string, (...args: string[]) => string> = {
     return String(editorContext.lineCount)
   },
 
+  // CSV/TSV to Table conversion
+  CSVTABLE: (text: string) => {
+    if (!text) return ''
+    const lines = text.trim().split('\n')
+    if (lines.length === 0) return ''
+
+    const rows = lines.map(line => {
+      // Parse CSV: handle quoted values with commas
+      const cells: string[] = []
+      let current = ''
+      let inQuotes = false
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i]
+        if (char === '"' && (i === 0 || line[i-1] !== '\\')) {
+          inQuotes = !inQuotes
+        } else if (char === ',' && !inQuotes) {
+          cells.push(current.trim())
+          current = ''
+        } else {
+          current += char
+        }
+      }
+      cells.push(current.trim())
+      return cells
+    })
+
+    // Build markdown table
+    const header = `| ${rows[0].join(' | ')} |`
+    const separator = `| ${rows[0].map(() => '---').join(' | ')} |`
+    const body = rows.slice(1).map(row => `| ${row.join(' | ')} |`).join('\n')
+
+    return `${header}\n${separator}\n${body}`
+  },
+  TSVTABLE: (text: string) => {
+    if (!text) return ''
+    const lines = text.trim().split('\n')
+    if (lines.length === 0) return ''
+
+    const rows = lines.map(line => line.split('\t').map(cell => cell.trim()))
+
+    // Build markdown table
+    const header = `| ${rows[0].join(' | ')} |`
+    const separator = `| ${rows[0].map(() => '---').join(' | ')} |`
+    const body = rows.slice(1).map(row => `| ${row.join(' | ')} |`).join('\n')
+
+    return `${header}\n${separator}\n${body}`
+  },
+
   // Document info (require editor context)
   LINE: () => {
     if (!editorContext) return '0'
@@ -608,6 +657,10 @@ export function getFormulaFunctions(): FormulaFunctionInfo[] {
     { name: 'CHECKLIST', description: 'Create checkbox list', example: 'CHECKLIST(selection)', category: 'Lines' },
     { name: 'INDENT', description: 'Indent lines', example: 'INDENT(selection, 4)', category: 'Lines' },
     { name: 'UNINDENT', description: 'Remove indentation', example: 'UNINDENT(selection, 2)', category: 'Lines' },
+
+    // Table conversion
+    { name: 'CSVTABLE', description: 'Convert CSV to markdown table', example: 'CSVTABLE(selection)', category: 'Table' },
+    { name: 'TSVTABLE', description: 'Convert TSV to markdown table', example: 'TSVTABLE(selection)', category: 'Table' },
 
     // Document info
     { name: 'LINE', description: 'Current line number', example: 'LINE()', category: 'Document' },

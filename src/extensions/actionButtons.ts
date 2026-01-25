@@ -31,7 +31,7 @@ class ActionButtonWidget extends WidgetType {
       e.preventDefault()
       const currentAction = useActionStore.getState().actions.find(a => a.id === this.actionId)
       if (currentAction) {
-        const result = executeAction(currentAction.code, view)
+        const result = executeAction(currentAction.code, view, this.actionId)
         
         if (result.success) {
           useNotificationStore.getState().addNotification({

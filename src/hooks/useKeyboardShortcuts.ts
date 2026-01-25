@@ -1,12 +1,16 @@
 import { useEffect } from 'react'
 import { useFileOperations } from './useFileOperations'
+import { useEditorCommands } from './useEditorCommands'
+import { useViewCommands } from './useViewCommands'
 import { useTabStore } from '../store/tabStore'
 import { useTemplateStore } from '../store/templateStore'
 import { useNotificationStore } from '../store/notificationStore'
 
 export function useKeyboardShortcuts() {
   const { openFile, saveFile, saveFileAs, newFile } = useFileOperations()
-  const { tabs, activeTabId, setActiveTab, removeTab, toggleRightSidebar, toggleLeftSidebar } = useTabStore()
+  const { tabs, activeTabId, setActiveTab, removeTab, toggleRightSidebar, toggleLeftSidebar, viewSettings } = useTabStore()
+  const { lockAll, unlockAll, toggleLock } = useEditorCommands()
+  const { toggleCodeBlockMarkers } = useViewCommands()
   const { addTemplate } = useTemplateStore()
   const addNotification = useNotificationStore(state => state.addNotification)
 
@@ -91,6 +95,34 @@ export function useKeyboardShortcuts() {
       if (e.key === 'b' && !e.shiftKey) {
         e.preventDefault()
         toggleLeftSidebar()
+        return
+      }
+
+      // Ctrl+L: Toggle current block lock
+      if (e.key === 'l' && !e.shiftKey) {
+        e.preventDefault()
+        toggleLock()
+        return
+      }
+
+      // Ctrl+Shift+L: Lock all blocks
+      if (e.key === 'L' && e.shiftKey) {
+        e.preventDefault()
+        lockAll()
+        return
+      }
+
+      // Ctrl+Shift+U: Unlock all blocks
+      if (e.key === 'U' && e.shiftKey) {
+        e.preventDefault()
+        unlockAll()
+        return
+      }
+
+      // Ctrl+Shift+M: Toggle markers
+      if (e.key === 'M' && e.shiftKey) {
+        e.preventDefault()
+        toggleCodeBlockMarkers()
         return
       }
 
