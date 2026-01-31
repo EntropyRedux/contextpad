@@ -27,8 +27,9 @@ Standard text editors are too simple for complex drafting, and IDEs are too bloa
 3. Use the Welcome tab or read the [User Guide](./USER_GUIDE.md) for instructions.
 
 ## Requirements
-- OS: Windows, macOS, or Linux (Tauri-supported).
+- OS: Windows, macOS, Linux, or Android (Tablets with Keyboard).
 - Runtime: No external dependencies for binaries.
+- **Android Note:** The Android build is a 1:1 desktop port optimized for tablet usage with a physical keyboard. Touch-only experience is not currently prioritized.
 
 ## Project Status
 Stable / Active.

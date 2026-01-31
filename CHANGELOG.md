@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.5.0-dev] - 2026-01-31
 ### Added
+- **Android Support:** Added v0.1.0 APK for Android Tablets (Keyboard-first design).
 - **Linux Support:** Added official `.AppImage` build for Linux platforms.
 - **Action Description:** New description field in the Action Builder for better documentation of custom logic.
 - **Action Type Indicators:** Visual badges (Mouse/Terminal) in the sidebar to distinguish between Buttons and Commands.
