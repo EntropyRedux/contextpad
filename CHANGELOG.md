@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.0-dev] - 2026-01-31
+### Added
+- **Linux Support:** Added official `.AppImage` build for Linux platforms.
+- **Action Description:** New description field in the Action Builder for better documentation of custom logic.
+- **Action Type Indicators:** Visual badges (Mouse/Terminal) in the sidebar to distinguish between Buttons and Commands.
+- **Nested Array Parsing:** Code block parameters now support array syntax (e.g., `key=["val1", "val2"]`).
+- **Dev Instance Mode:** New app identifier (`...contextpad.dev`) allowing parallel execution with installed production versions.
+
+### Fixed
+- **Startup Reliability:** Refactored file-opening logic to prevent duplicate tabs and improve "Open With" context menu stability.
+- **Category Casing:** Removed forced uppercase normalization for categories in all managers.
+- **Accessibility:** Added missing aria-labels to sidebar action buttons.
+- **Code Hygiene:** Removed unused Rust secrets structures.
+
 ## [1.5.0] - 2026-01-25
 ### Added
 - **Welcome Document:** Interactive introduction loaded on first launch or when no tabs are present.
