@@ -78,21 +78,7 @@ const loadPersistedActions = (): Action[] => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY_ACTIONS)
     if (saved) {
-      const actions = JSON.parse(saved) as Action[]
-      // Normalize categories
-      let needsNormalization = false
-      const normalized = actions.map(action => {
-        const upperCategory = action.category.toUpperCase()
-        if (action.category !== upperCategory) {
-          needsNormalization = true
-          return { ...action, category: upperCategory }
-        }
-        return action
-      })
-      if (needsNormalization) {
-        localStorage.setItem(STORAGE_KEY_ACTIONS, JSON.stringify(normalized))
-      }
-      return normalized
+      return JSON.parse(saved) as Action[]
     }
   } catch (error) {
     console.error('Failed to load actions:', error)
@@ -146,7 +132,7 @@ export const useActionStore = create<ActionState>((set, get) => {
     addAction: (action) => {
       const newAction: Action = {
         ...action,
-        category: action.category.toUpperCase(),
+        category: action.category,
         id: crypto.randomUUID(),
         isDefault: false,
         createdAt: Date.now(),
@@ -162,11 +148,11 @@ export const useActionStore = create<ActionState>((set, get) => {
 
     addActionsBulk: (newActions) => {
       set((state) => {
-        // Ensure IDs and normalized categories
+        // Ensure IDs
         const processed = newActions.map(a => ({
           ...a,
           id: a.id || crypto.randomUUID(),
-          category: a.category.toUpperCase(),
+          category: a.category,
           updatedAt: Date.now()
         }))
         
@@ -178,11 +164,8 @@ export const useActionStore = create<ActionState>((set, get) => {
 
     updateAction: (id, updates) => {
       set((state) => {
-        const normalizedUpdates = updates.category
-          ? { ...updates, category: updates.category.toUpperCase() }
-          : updates
         const actions = state.actions.map(a =>
-          a.id === id ? { ...a, ...normalizedUpdates, updatedAt: Date.now() } : a
+          a.id === id ? { ...a, ...updates, updatedAt: Date.now() } : a
         )
         persistActions(actions)
         return { actions }

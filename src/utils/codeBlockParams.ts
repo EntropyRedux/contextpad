@@ -14,7 +14,7 @@
 // =============================================================================
 
 export interface CodeBlockParams {
-  [key: string]: string | boolean
+  [key: string]: string | boolean | string[]
 }
 
 export interface ParsedCodeBlock {
@@ -93,12 +93,12 @@ export function parseCodeBlockParams(paramsString: string): CodeBlockParams {
 
       // Parse value
       if (i < len) {
-        const quote = paramsString[i]
+        const char = paramsString[i]
 
-        if (quote === '"' || quote === "'") {
+        if (char === '"' || char === "'") {
           // Quoted string value
+          const quote = char
           i++ // consume opening quote
-          const valueStart = i
           let value = ''
 
           while (i < len && paramsString[i] !== quote) {
@@ -117,6 +117,43 @@ export function parseCodeBlockParams(paramsString: string): CodeBlockParams {
           }
 
           params[key] = value
+        } else if (char === '[') {
+          // Array value: ["a", "b"]
+          i++ // consume '['
+          const arrayValues: string[] = []
+          
+          while (i < len && paramsString[i] !== ']') {
+            // Skip whitespace/commas
+            while (i < len && /[\s,]/.test(paramsString[i])) {
+              i++
+            }
+            
+            if (paramsString[i] === ']') break
+            
+            // Parse item (expect quoted string)
+            if (paramsString[i] === '"' || paramsString[i] === "'") {
+              const quote = paramsString[i]
+              i++
+              let val = ''
+              while (i < len && paramsString[i] !== quote) {
+                if (paramsString[i] === '\\' && i + 1 < len) {
+                  i++
+                  val += paramsString[i]
+                } else {
+                  val += paramsString[i]
+                }
+                i++
+              }
+              if (i < len) i++ // close quote
+              arrayValues.push(val)
+            } else {
+              // Fallback for unquoted items in array? (e.g. [a, b])
+              // For now, strict quoted strings in arrays to avoid complexity
+              i++
+            }
+          }
+          if (i < len) i++ // consume ']'
+          params[key] = arrayValues
         } else {
           // Unquoted value (until comma, whitespace, or end)
           const valueStart = i

@@ -358,6 +358,14 @@ export function ActionManager() {
             value={formData.name} 
             onChange={e => setFormData({...formData, name: e.target.value})} 
           />
+          <textarea
+            className={styles.textarea}
+            placeholder="Description"
+            value={formData.description}
+            onChange={e => setFormData({...formData, description: e.target.value})}
+            rows={2}
+            style={{ minHeight: '60px', marginBottom: '8px' }}
+          />
           {editingId && (
             <div style={{display: 'flex', gap: 4}}>
               <input 
@@ -417,6 +425,9 @@ export function ActionManager() {
             isHidden={!action.enabled}
             badges={
               <>
+                <span className={styles.typeBadge} title={action.type === 'button' ? 'Button Action' : 'Command Action'}>
+                  {action.type === 'button' ? <MousePointerClick size={10} /> : <Terminal size={10} />}
+                </span>
                 {isActionPinned(action.id) && <Star size={10} fill="orange" stroke="none" style={{marginLeft: 4}} />}
                 {!action.enabled && <span className={styles.hiddenBadge}>Disabled</span>}
               </>
@@ -427,12 +438,16 @@ export function ActionManager() {
                   className={styles.playButton}
                   onClick={() => handleExecute(action.id)}
                   disabled={!action.enabled}
+                  aria-label={`Execute ${action.name}`}
+                  title="Execute"
                 >
                   <Play size={12} fill="currentColor" />
                 </button>
                 <button 
                   className={styles.actionButton}
                   onClick={() => handleEdit(action.id)}
+                  aria-label={`Edit ${action.name}`}
+                  title="Edit"
                 >
                   <Edit2 size={12} />
                 </button>

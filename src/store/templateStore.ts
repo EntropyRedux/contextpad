@@ -82,21 +82,7 @@ const loadPersistedTemplates = (): Template[] => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY_TEMPLATES)
     if (saved) {
-      const templates = JSON.parse(saved) as Template[]
-      // Normalize categories
-      let needsNormalization = false
-      const normalized = templates.map(template => {
-        const upperCategory = template.category.toUpperCase()
-        if (template.category !== upperCategory) {
-          needsNormalization = true
-          return { ...template, category: upperCategory }
-        }
-        return template
-      })
-      if (needsNormalization) {
-        localStorage.setItem(STORAGE_KEY_TEMPLATES, JSON.stringify(normalized))
-      }
-      return normalized
+      return JSON.parse(saved) as Template[]
     }
   } catch (error) {
     console.error('Failed to load templates:', error)
@@ -151,7 +137,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => {
     addTemplate: (template) => {
       const newTemplate: Template = {
         ...template,
-        category: template.category.toUpperCase(),
+        category: template.category,
         id: crypto.randomUUID(),
         variables: extractVariables(template.content),
         createdAt: Date.now(),
@@ -170,7 +156,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => {
         const processed = newTemplates.map(t => ({
           ...t,
           id: t.id || crypto.randomUUID(),
-          category: t.category.toUpperCase(),
+          category: t.category,
           variables: extractVariables(t.content),
           updatedAt: Date.now()
         }))
@@ -183,14 +169,11 @@ export const useTemplateStore = create<TemplateState>((set, get) => {
 
     updateTemplate: (id, updates) => {
       set((state) => {
-        const normalizedUpdates = updates.category
-          ? { ...updates, category: updates.category.toUpperCase() }
-          : updates
         const templates = state.templates.map(t => {
           if (t.id === id) {
-            const updated = { ...t, ...normalizedUpdates, updatedAt: Date.now() }
-            if (normalizedUpdates.content !== undefined) {
-              updated.variables = extractVariables(normalizedUpdates.content)
+            const updated = { ...t, ...updates, updatedAt: Date.now() }
+            if (updates.content !== undefined) {
+              updated.variables = extractVariables(updates.content)
             }
             return updated
           }

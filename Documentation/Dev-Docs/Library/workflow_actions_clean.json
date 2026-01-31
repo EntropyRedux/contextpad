@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-01-25T13:20:26.234Z",
+  "actions": [
+    {
+      "id": "c7c3098f-5121-4edb-bcb5-2b9ccf481be6",
+      "name": "⨁ Clear YAML Blocks",
+      "description": "Scans the entire document and removes all YAML code blocks, including the ```yaml fences, markers, and their content.",
+      "type": "button",
+      "code": "const doc = editor.state.doc;\nconst changes = [];\nlet inYaml = false;\nlet startPos = -1;\n\nfor (let i = 1; i <= doc.lines; i++) {\n  const line = doc.line(i);\n  const text = line.text.trim();\n\n  if (!inYaml && text.startsWith('```yaml')) {\n    inYaml = true;\n    startPos = line.from;\n  } else if (inYaml && text.startsWith('```')) {\n    inYaml = false;\n    changes.push({ \n      from: startPos, \n      to: Math.min(doc.length, line.to + 1) \n    });\n  }\n}\n\nif (changes.length > 0) {\n  editor.dispatch({ changes });\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1768891893152,
+      "updatedAt": 1769346076322
+    },
+    {
+      "id": "2e1ef6e9-af87-4108-b2ab-d0e5caacf0c6",
+      "name": "⨁ Copy Next YAML Content",
+      "description": "Finds the first YAML block located below the cursor's current position and copies its content to the clipboard (excludes the fences).",
+      "type": "button",
+      "code": "const doc = editor.state.doc;\nconst pos = editor.state.selection.main.head;\nconst startLine = doc.lineAt(pos).number;\nlet recording = false;\nconst content = [];\n\nfor (let i = startLine; i <= doc.lines; i++) {\n  const line = doc.line(i).text;\n  if (!recording && line.trim().startsWith('```yaml')) {\n    recording = true;\n    continue;\n  }\n  if (recording) {\n    if (line.trim().startsWith('```')) break;\n    content.push(line);\n  }\n}\n\nif (content.length > 0) {\n  navigator.clipboard.writeText(content.join('\\n'));\n  console.log(\"YAML content copied to clipboard.\");\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1768892007302,
+      "updatedAt": 1769345988810
+    },
+    {
+      "id": "6147aa34-6eb1-4a7a-88ba-7ab306052726",
+      "name": "⨁ Clear YAML Values",
+      "description": "Preserves the YAML structure (fences and keys) but deletes all values after the colons and list markers.",
+      "type": "button",
+      "code": "const doc = editor.state.doc;\nconst changes = [];\nlet inYaml = false;\n\nfor (let i = 1; i <= doc.lines; i++) {\n  const line = doc.line(i);\n  const text = line.text;\n  const trimmed = text.trim();\n\n  if (trimmed.startsWith('```yaml')) { inYaml = true; continue; }\n  if (inYaml && trimmed.startsWith('```')) { inYaml = false; continue; }\n\n  if (inYaml) {\n    const colonIndex = text.indexOf(':');\n    if (colonIndex !== -1) {\n      const keyPart = text.substring(0, colonIndex + 1);\n      changes.push({ from: line.from, to: line.to, insert: keyPart });\n      continue;\n    }\n\n    const dashIndex = text.indexOf('-');\n    if (dashIndex !== -1 && text.substring(dashIndex).trim().startsWith('- ')) {\n      const listPart = text.substring(0, dashIndex + 1) + ' ';\n      changes.push({ from: line.from, to: line.to, insert: listPart });\n    }\n  }\n}\n\nif (changes.length > 0) {\n  editor.dispatch({ changes });\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1768892455957,
+      "updatedAt": 1769345999430
+    },
+    {
+      "id": "ae155ecc-c8c1-4997-8338-2b4cdf97a050",
+      "name": "⨁ Copy Next YAML Values",
+      "description": "Finds the first YAML block below the cursor and copies only the values.",
+      "type": "button",
+      "code": "const doc = editor.state.doc;\nconst pos = editor.state.selection.main.head;\nconst startLine = doc.lineAt(pos).number;\nlet recording = false;\nconst values = [];\n\nfor (let i = startLine; i <= doc.lines; i++) {\n  const line = doc.line(i).text;\n  const trimmed = line.trim();\n\n  if (!recording && trimmed.startsWith('```yaml')) {\n    recording = true;\n    continue;\n  }\n  \n  if (recording) {\n    if (trimmed.startsWith('```')) break;\n    if (!trimmed || trimmed.startsWith('#')) continue;\n\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      const val = line.substring(colonIndex + 1).trim();\n      if (val) {\n        values.push(val);\n      }\n    }\n  }\n}\n\nif (values.length > 0) {\n  navigator.clipboard.writeText(values.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1768892501029,
+      "updatedAt": 1769346004437
+    },
+    {
+      "id": "163942a7-dcff-4c3b-807a-4196fe5469db",
+      "name": "Ϟ Wrap in ''",
+      "description": "Executes SINGLEQUOTE formula to wrap selected text in single quotes.",
+      "type": "command",
+      "code": "FORMULA:SINGLEQUOTE()",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1769346056493,
+      "updatedAt": 1769346087948
+    },
+    {
+      "id": "f8a2c1d4-3e5b-4a9f-b7c6-8d1e2f3a4b5c",
+      "name": "⨁ Reset YAML to Variables",
+      "description": "Resets YAML values inside [[...]] to {{variable}} placeholders based on key names. Works with locked blocks.",
+      "type": "button",
+      "code": "const doc = editor.state.doc;\nconst changes = [];\nlet inYaml = false;\n\nfor (let i = 1; i <= doc.lines; i++) {\n  const line = doc.line(i);\n  const text = line.text;\n  const trimmed = text.trim();\n\n  if (trimmed.startsWith('```yaml')) { inYaml = true; continue; }\n  if (inYaml && trimmed.startsWith('```')) { inYaml = false; continue; }\n\n  if (inYaml) {\n    const colonIndex = text.indexOf(':');\n    if (colonIndex !== -1) {\n      const key = text.substring(0, colonIndex).trim();\n      const openBracket = text.indexOf('[[', colonIndex);\n      const closeBracket = text.indexOf(']]', openBracket);\n      if (openBracket !== -1 && closeBracket !== -1) {\n        const replaceFrom = line.from + openBracket + 2;\n        const replaceTo = line.from + closeBracket;\n        const newContent = '{{' + key + '}}';\n        changes.push({ from: replaceFrom, to: replaceTo, insert: newContent });\n      }\n    }\n  }\n}\n\nif (changes.length > 0) {\n  editor.dispatch({ changes });\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1769400000000,
+      "updatedAt": 1769400000000
+    }
+  ]
+}

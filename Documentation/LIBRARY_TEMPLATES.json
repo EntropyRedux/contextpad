@@ -1,0 +1,193 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-01-25T12:00:00.000Z",
+  "templates": [
+    {
+      "name": "AI Persona: Senior Python Dev",
+      "category": "AI Prompts",
+      "content": "You are a Senior Python Developer with 15 years of experience. \nYour code must be:\n- PEP 8 compliant\n- Type-hinted (mypy strict)\n- Optimized for performance (Big O notation provided)\n- Unit tested (pytest)\n\nTask: {{task_description}}"
+    },
+    {
+      "name": "AI Persona: Data Scientist",
+      "category": "AI Prompts",
+      "content": "Act as a Lead Data Scientist. \nFocus on:\n- Exploratory Data Analysis (EDA)\n- Feature Engineering\n- Model Selection justification\n- Metrics (ROC-AUC, F1, RMSE)\n\nDataset description: {{dataset_description}}\nGoal: {{goal}}"
+    },
+    {
+      "name": "AI Persona: UX Writer",
+      "category": "AI Prompts",
+      "content": "You are a UX Writer for a SaaS product. \nTone: Friendly, concise, clear, and action-oriented.\nAvoid jargon. Use active voice.\n\nContext: {{user_context}}\nDraft copy for: {{component_name}}"
+    },
+    {
+      "name": "Zero-Shot Chain of Thought",
+      "category": "AI Prompts",
+      "content": "Let's think step by step.\n1. First, {{step_1}}\n2. Then, {{step_2}}\n3. Finally, {{step_3}}"
+    },
+    {
+      "name": "Few-Shot Classification",
+      "category": "AI Prompts",
+      "content": "Classify the sentiment of the following texts.\n\nText: \"I loved the service!\" -> Positive\nText: \"It was okay, not great.\" -> Neutral\nText: \"Terrible experience.\" -> Negative\nText: \"{{input_text}}\" ->"
+    },
+    {
+      "name": "Code Review Checklist",
+      "category": "Software Dev",
+      "content": "## Code Review\n- [ ] Logic is correct and meets requirements\n- [ ] Error handling is robust\n- [ ] No security vulnerabilities (SQLi, XSS)\n- [ ] Variable/Function names are descriptive\n- [ ] Comments explain WHY, not WHAT\n- [ ] Tests added/updated\n\nReviewer: {{reviewer_name}}"
+    },
+    {
+      "name": "Bug Report",
+      "category": "Software Dev",
+      "content": "### Bug Report\n**Description:** {{description}}\n\n**Steps to Reproduce:**\n1. {{step_1}}\n2. {{step_2}}\n3. \n\n**Expected Behavior:** {{expected}}\n**Actual Behavior:** {{actual}}\n**Environment:** {{environment}}"
+    },
+    {
+      "name": "User Story (Agile)",
+      "category": "Software Dev",
+      "content": "**As a** {{role}}\n**I want to** {{feature}}\n**So that** {{benefit}}\n\n**Acceptance Criteria:**\n- {{criteria_1}}\n- {{criteria_2}}"
+    },
+    {
+      "name": "Git Commit Message",
+      "category": "Software Dev",
+      "content": "{{type}}(scope): {{subject}}\n\n{{body}}\n\nCloses #{{issue_id}}"
+    },
+    {
+      "name": "Pull Request Template",
+      "category": "Software Dev",
+      "content": "## Summary\n{{summary}}\n\n## Changes\n- {{change_1}}\n- {{change_2}}\n\n## Testing\n- [ ] Unit tests passed\n- [ ] Manual testing verified"
+    },
+    {
+      "name": "React Component (TS)",
+      "category": "Software Dev",
+      "content": "import { ReactNode } from 'react'\nimport styles from './{{ComponentName}}.module.css'\n\ninterface {{ComponentName}}Props {\n  children: ReactNode\n}\n\nexport function {{ComponentName}}({ children }: {{ComponentName}}Props) {\n  return (\n    <div className={styles.container}>\n      {children}\n    </div>\n  )\n}"
+    },
+    {
+      "name": "Python Script Header",
+      "category": "Software Dev",
+      "content": "\"\"\"\nModule: {{module_name}}\nDescription: {{description}}\nAuthor: {{author}}\nDate: {{date}}\n\"\"\"\n\nimport os\nimport sys\nimport logging\n\ndef main():\n    pass\n\nif __name__ == '__main__':\n    main()"
+    },
+    {
+      "name": "SQL Select Basic",
+      "category": "Data Science",
+      "content": "SELECT \n    {{columns}}\nFROM \n    {{table}}\nWHERE \n    {{condition}}\nORDER BY \n    {{sort_col}} DESC\nLIMIT {{limit}};&#"
+    },
+    {
+      "name": "Pandas CSV Load",
+      "category": "Data Science",
+      "content": "import pandas as pd\n\n# Load Data\ndf = pd.read_csv('{{file_path}}')\n\n# Basic Info\nprint(df.info())\nprint(df.head())\nprint(df.describe())"
+    },
+    {
+      "name": "Regex Email Pattern",
+      "category": "Data Analysis",
+      "content": "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"
+    },
+    {
+      "name": "Regex Date (ISO)",
+      "category": "Data Analysis",
+      "content": "\\d{4}-\\d{2}-\\d{2}"
+    },
+    {
+      "name": "Regex Phone (US)",
+      "category": "Data Analysis",
+      "content": "\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\n\\s]?\\d{4}"
+    },
+    {
+      "name": "Meeting Minutes",
+      "category": "Workflow",
+      "content": "# Meeting Minutes\n**Date:** {{date}}\n**Attendees:** {{attendees}}\n\n## Agenda\n1. {{topic_1}}\n2. {{topic_2}}\n\n## Action Items\n- [ ] {{action_1}} (Owner: {{owner_1}})\n- [ ] {{action_2}} (Owner: {{owner_2}})"
+    },
+    {
+      "name": "Daily Standup",
+      "category": "Workflow",
+      "content": "1. **Yesterday:** {{yesterday_tasks}}\n2. **Today:** {{today_tasks}}\n3. **Blockers:** {{blockers}}"
+    },
+    {
+      "name": "OKR Goal Setting",
+      "category": "Workflow",
+      "content": "**Objective:** {{objective}}\n\n**Key Result 1:** {{kr_1}}\n**Key Result 2:** {{kr_2}}\n**Key Result 3:** {{kr_3}}"
+    },
+    {
+      "name": "Email: Professional Intro",
+      "category": "Communication",
+      "content": "Subject: Introduction - {{topic}}\n\nDear {{name}},\n\nI hope this email finds you well.\n\nMy name is {{my_name}} and I am reaching out regarding {{context}}.\n\nBest regards,\n{{my_name}}"
+    },
+    {
+      "name": "Email: Follow Up",
+      "category": "Communication",
+      "content": "Hi {{name}},\n\nI'm writing to follow up on my previous email regarding {{topic}}. Do you have any updates?\n\nThanks,\n{{my_name}}"
+    },
+    {
+      "name": "HTML5 Boilerplate",
+      "category": "Web Dev",
+      "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>{{title}}</title>\n    <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n    <h1>{{header}}</h1>\n    <script src=\"app.js\"></script>\n</body>\n</html>"
+    },
+    {
+      "name": "CSS Reset (Mini)",
+      "category": "Web Dev",
+      "content": "* {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n}\n\nbody {\n  line-height: 1.5;\n  font-family: system-ui, sans-serif;\n}"
+    },
+    {
+      "name": "Docker Node.js",
+      "category": "DevOps",
+      "content": "FROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nEXPOSE {{port}}\nCMD [\"npm\", \"start\"]"
+    },
+    {
+      "name": "Docker Python",
+      "category": "DevOps",
+      "content": "FROM python:3.9-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"python\", \"{{script}}.py\"]"
+    },
+    {
+      "name": "JSON Config",
+      "category": "Config",
+      "content": "{\n  \"app_name\": \"{{app_name}}\",\n  \"version\": \"1.0.0\",\n  \"debug\": true,\n  \"features\": [\n    \"{{feature_1}}\",\n    \"{{feature_2}}\"\n  ]\n}"
+    },
+    {
+      "name": "YAML Kubernetes Pod",
+      "category": "DevOps",
+      "content": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: {{pod_name}}\n  labels:\n    app: {{app_label}}\nspec:\n  containers:\n  - name: {{container_name}}\n    image: {{image_name}}\n    ports:\n    - containerPort: {{port}}"
+    },
+    {
+      "name": "Markdown Table",
+      "category": "Documentation",
+      "content": "| {{col1}} | {{col2}} | {{col3}} |\n| --- | --- | --- |\n| {{val1}} | {{val2}} | {{val3}} |"
+    },
+    {
+      "name": "Mermaid Flowchart",
+      "category": "Documentation",
+      "content": "```mermaid\ngraph TD;\n    A[{{start}}] --> B{{step_1}};\n    B --> C{{step_2}};\n    C --> D[{{end}}];\n```"
+    },
+    {
+      "name": "Prompt: Summarize",
+      "category": "AI Prompts",
+      "content": "Please summarize the following text into {{bullet_points}} bullet points. Focus on the main arguments and ignore minor details.\n\nText:\n{{input_text}}"
+    },
+    {
+      "name": "Prompt: Translate",
+      "category": "AI Prompts",
+      "content": "Translate the following text from {{source_lang}} to {{target_lang}}.\n\nText:\n{{input_text}}"
+    },
+    {
+      "name": "MCP Server (Typescript)",
+      "category": "MCP",
+      "content": "import { Server } from \"@modelcontextprotocol/sdk/server/index.js\";\nimport { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\";\nimport {\n  CallToolRequestSchema,\n  ErrorCode,\n  ListToolsRequestSchema,\n  McpError,\n} from \"@modelcontextprotocol/sdk/types.js\";\n\nconst server = new Server(\n  {\n    name: \"{{server_name}}\",\n    version: \"0.1.0\",\n  },\n  {\n    capabilities: {\n      tools: {},\n    },\n  }\n);\n\nserver.setRequestHandler(ListToolsRequestSchema, async () => {\n  return {\n    tools: [\n      {\n        name: \"{{tool_name}}\",\n        description: \"{{tool_description}}\",\n        inputSchema: {\n          type: \"object\",\n          properties: {\n            {{arg_name}}: { type: \"string\" },\n          },\n          required: [\"{{arg_name}}\"],\n        },\n      },\n    ],\n  };\n});\n\nserver.setRequestHandler(CallToolRequestSchema, async (request) => {\n  if (request.params.name !== \"{{tool_name}}\") {\n    throw new McpError(ErrorCode.MethodNotFound, \"Unknown tool\");\n  }\n\n  return {\n    content: [\n      {\n        type: \"text\",\n        text: `Executed {{tool_name}} successfully`,
+      },
+    ],
+  };
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);"
+    },
+    {
+      "name": "MCP Server (Python)",
+      "category": "MCP",
+      "content": "from mcp.server.fastmcp import FastMCP\n\nmcp = FastMCP(\"{{server_name}}\")\n\n@mcp.tool()\ndef {{tool_name}}(input_text: str) -> str:\n    \"\"\"{{tool_description}}\"""\n    return f\"Processed: {input_text}\"\n\nif __name__ == \"__main__\":\n    mcp.run()"
+    },
+    {
+      "name": "Agent Skill (YAML)",
+      "category": "Agent Config",
+      "content": "- name: {{skill_name}}\n  description: {{skill_description}}\n  intent: {{intent_keyword}}\n  mcp: {{mcp_tool_id}}\n  scope:\n    - \"**/*\""
+    },
+    {
+      "name": "Agent Policy",
+      "category": "Agent Config",
+      "content": "# AI Agent Policy\n\nPurpose:\n- {{purpose_1}}\n- {{purpose_2}}\n\nNon-negotiables:\n- {{rule_1}}\n- {{rule_2}}\n- Session logging required\n\nEnforcement is delegated to MCP servers."
+    }
+  ]
+}

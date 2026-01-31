@@ -1,0 +1,270 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-01-25T12:00:00.000Z",
+  "actions": [
+    {
+      "name": "To Uppercase",
+      "description": "Convert selection to UPPERCASE",
+      "type": "command",
+      "code": "FORMULA:UPPER(selection)",
+      "category": "Text Transform",
+      "enabled": true
+    },
+    {
+      "name": "To Lowercase",
+      "description": "Convert selection to lowercase",
+      "type": "command",
+      "code": "FORMULA:LOWER(selection)",
+      "category": "Text Transform",
+      "enabled": true
+    },
+    {
+      "name": "To Title Case",
+      "description": "Capitalize Each Word",
+      "type": "command",
+      "code": "FORMULA:TITLE(selection)",
+      "category": "Text Transform",
+      "enabled": true
+    },
+    {
+      "name": "Trim Whitespace",
+      "description": "Remove leading/trailing spaces",
+      "type": "command",
+      "code": "FORMULA:TRIM(selection)",
+      "category": "Text Transform",
+      "enabled": true
+    },
+    {
+      "name": "Reverse Text",
+      "description": "esreveR txet",
+      "type": "command",
+      "code": "FORMULA:REVERSE(selection)",
+      "category": "Text Transform",
+      "enabled": true
+    },
+    {
+      "name": "To Snake Case",
+      "description": "Convert to snake_case",
+      "type": "command",
+      "code": "FORMULA:SNAKE(selection)",
+      "category": "Coding Case",
+      "enabled": true
+    },
+    {
+      "name": "To Camel Case",
+      "description": "Convert to camelCase",
+      "type": "command",
+      "code": "FORMULA:CAMEL(selection)",
+      "category": "Coding Case",
+      "enabled": true
+    },
+    {
+      "name": "To Kebab Case",
+      "description": "Convert to kebab-case",
+      "type": "command",
+      "code": "FORMULA:KEBAB(selection)",
+      "category": "Coding Case",
+      "enabled": true
+    },
+    {
+      "name": "To Pascal Case",
+      "description": "Convert to PascalCase",
+      "type": "command",
+      "code": "FORMULA:PASCAL(selection)",
+      "category": "Coding Case",
+      "enabled": true
+    },
+    {
+      "name": "To Constant Case",
+      "description": "Convert to CONSTANT_CASE",
+      "type": "command",
+      "code": "FORMULA:CONSTANT(selection)",
+      "category": "Coding Case",
+      "enabled": true
+    },
+    {
+      "name": "Sort Lines (A-Z)",
+      "description": "Sort selected lines alphabetically",
+      "type": "command",
+      "code": "FORMULA:SORT(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "Sort Lines (Z-A)",
+      "description": "Sort selected lines descending",
+      "type": "command",
+      "code": "FORMULA:SORTDESC(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "Sort Numeric",
+      "description": "Sort lines by number value",
+      "type": "command",
+      "code": "FORMULA:SORTNUMERIC(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "Remove Duplicates",
+      "description": "Remove duplicate lines",
+      "type": "command",
+      "code": "FORMULA:UNIQUE(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "Numbered List",
+      "description": "Convert lines to 1. 2. 3.",
+      "type": "command",
+      "code": "FORMULA:NUMBERLIST(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "Bullet List",
+      "description": "Convert lines to - item",
+      "type": "command",
+      "code": "FORMULA:BULLETLIST(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "Checklist",
+      "description": "Convert lines to - [ ] item",
+      "type": "command",
+      "code": "FORMULA:CHECKLIST(selection)",
+      "category": "Lines",
+      "enabled": true
+    },
+    {
+      "name": "CSV to Table",
+      "description": "Convert CSV to Markdown Table",
+      "type": "command",
+      "code": "FORMULA:CSVTABLE(selection)",
+      "category": "Format",
+      "enabled": true
+    },
+    {
+      "name": "TSV to Table",
+      "description": "Convert Tab-Separated to Markdown Table",
+      "type": "command",
+      "code": "FORMULA:TSVTABLE(selection)",
+      "category": "Format",
+      "enabled": true
+    },
+    {
+      "name": "Wrap in Code Block",
+      "description": "Wrap selection in ``` ```",
+      "type": "command",
+      "code": "FORMULA:CODEBLOCK(selection)",
+      "category": "Markdown",
+      "enabled": true
+    },
+    {
+      "name": "Wrap in Quotes",
+      "description": "Wrap selection in \"quotes\"",
+      "type": "command",
+      "code": "FORMULA:DOUBLEQUOTE(selection)",
+      "category": "Format",
+      "enabled": true
+    },
+    {
+      "name": "Insert Date",
+      "description": "Insert YYYY-MM-DD",
+      "type": "command",
+      "code": "FORMULA:TODAY()",
+      "category": "Insert",
+      "enabled": true
+    },
+    {
+      "name": "Insert Time",
+      "description": "Insert HH:MM:SS",
+      "type": "command",
+      "code": "FORMULA:TIME()",
+      "category": "Insert",
+      "enabled": true
+    },
+    {
+      "name": "Insert UUID",
+      "description": "Generate random UUID",
+      "type": "command",
+      "code": "FORMULA:UUID()",
+      "category": "Insert",
+      "enabled": true
+    },
+    {
+      "name": "Math: Sum",
+      "description": "Sum selected numbers",
+      "type": "command",
+      "code": "FORMULA:SUM(selection)",
+      "category": "Math",
+      "enabled": true
+    },
+    {
+      "name": "Math: Average",
+      "description": "Average selected numbers",
+      "type": "command",
+      "code": "FORMULA:AVG(selection)",
+      "category": "Math",
+      "enabled": true
+    },
+    {
+      "name": "Encode Base64",
+      "description": "Encode text to Base64",
+      "type": "command",
+      "code": "FORMULA:BASE64(selection)",
+      "category": "Encode",
+      "enabled": true
+    },
+    {
+      "name": "Decode Base64",
+      "description": "Decode Base64 to text",
+      "type": "command",
+      "code": "FORMULA:BASE64D(selection)",
+      "category": "Encode",
+      "enabled": true
+    },
+    {
+      "name": "URL Encode",
+      "description": "Encode URL special chars",
+      "type": "command",
+      "code": "FORMULA:URLENCODE(selection)",
+      "category": "Encode",
+      "enabled": true
+    },
+    {
+      "name": "Character Count",
+      "description": "Replace with char count",
+      "type": "command",
+      "code": "FORMULA:LEN(selection)",
+      "category": "Stats",
+      "enabled": true
+    },
+    {
+      "name": "JS: Extract Emails",
+      "description": "Extract all emails from text",
+      "type": "command",
+      "code": "const text = helpers.getSelection();\nconst emails = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g);\nif (emails) {\n  helpers.replaceSelection(emails.join('\n'));\n} else {\n  alert('No emails found');\n}",
+      "category": "JavaScript",
+      "enabled": true
+    },
+    {
+      "name": "JS: Minify JSON",
+      "description": "Minify selected JSON",
+      "type": "command",
+      "code": "try {\n  const json = JSON.parse(helpers.getSelection());\n  helpers.replaceSelection(JSON.stringify(json));\n} catch (e) {\n  alert('Invalid JSON');\n}",
+      "category": "JavaScript",
+      "enabled": true
+    },
+    {
+      "name": "JS: Format JSON",
+      "description": "Pretty print JSON",
+      "type": "command",
+      "code": "try {\n  const json = JSON.parse(helpers.getSelection());\n  helpers.replaceSelection(JSON.stringify(json, null, 2));\n} catch (e) {\n  alert('Invalid JSON');\n}",
+      "category": "JavaScript",
+      "enabled": true
+    }
+  ]
+}

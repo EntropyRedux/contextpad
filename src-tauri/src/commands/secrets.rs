@@ -1,12 +1,6 @@
 use keyring::Entry;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ApiKeyData {
-    pub provider: String,
-    pub key: String,
-}
-
 #[tauri::command]
 pub fn store_api_key(provider: String, key: String) -> Result<(), String> {
     let entry = Entry::new("ContextPad", &format!("api_key_{}", provider))

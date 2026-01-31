@@ -8,7 +8,6 @@ import { useTabStore } from '../store/tabStore'
  */
 export function useStartupFiles() {
   const addTab = useTabStore(state => state.addTab)
-  const tabs = useTabStore(state => state.tabs)
   const setActiveTab = useTabStore(state => state.setActiveTab)
   const addRecentFile = useTabStore(state => state.addRecentFile)
 
@@ -19,11 +18,12 @@ export function useStartupFiles() {
       // Listen for files opened via CLI or deep link
       unlisten = await listen<string[]>('open-files', async (event) => {
         const filePaths = event.payload
+        const currentTabs = useTabStore.getState().tabs
 
         for (const filePath of filePaths) {
           try {
             // Check if already open
-            const existingTab = tabs.find(t => t.filePath === filePath)
+            const existingTab = currentTabs.find(t => t.filePath === filePath)
             if (existingTab) {
               setActiveTab(existingTab.id)
               continue
@@ -57,5 +57,5 @@ export function useStartupFiles() {
         unlisten()
       }
     }
-  }, [tabs, addTab, setActiveTab, addRecentFile])
+  }, [addTab, setActiveTab, addRecentFile])
 }
