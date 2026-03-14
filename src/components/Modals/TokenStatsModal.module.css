@@ -1,0 +1,22 @@
+.overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(2px); }
+.modal { background-color: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 8px; width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; animation: slideIn 0.2s ease-out; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); background-color: var(--bg-raised); }
+.title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.closeButton { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.closeButton:hover { background-color: var(--hover-bg); color: var(--text-bright); }
+.content { padding: 20px; display: flex; flex-direction: column; gap: 24px; }
+.section { display: flex; flex-direction: column; gap: 12px; }
+.sectionHeader { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.usageCard { background-color: var(--bg-raised); border-radius: 6px; padding: 16px; border: 1px solid var(--border-subtle); }
+.usageHeader { display: flex; align-items: baseline; gap: 6px; margin-bottom: 12px; }
+.usageValue { font-size: 24px; font-weight: 700; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.usageLimit { font-size: 13px; color: var(--text-muted); }
+.progressBarBg { height: 6px; background-color: var(--border-default); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.progressBarFill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.usageMeta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
+.badge { background-color: var(--accent-muted); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.metricsList { display: flex; flex-direction: column; gap: 8px; }
+.metricRow { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background-color: var(--bg-raised); border-radius: 4px; font-size: 13px; color: var(--text-primary); }
+.metricValue { font-family: Consolas, Monaco, monospace; font-weight: 500; color: var(--text-bright); }

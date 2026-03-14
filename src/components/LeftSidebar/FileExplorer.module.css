@@ -1,0 +1,59 @@
+.container {
+  height: 100%;
+  overflow-y: auto;
+  color: var(--text-primary);
+  font-size: 13px;
+  user-select: none;
+}
+
+.emptyState { padding: 20px; text-align: center; color: var(--text-muted); }
+.emptyState h3 { font-size: 14px; margin-bottom: 12px; color: var(--text-primary); font-weight: 500; }
+.emptyState p { font-size: 12px; margin-bottom: 16px; line-height: 1.5; }
+
+.openButton {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: opacity 0.15s;
+}
+
+.openButton:hover { opacity: 0.9; }
+
+.tree { padding: 8px 0; }
+
+.folderHeader {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  background: var(--hover-bg);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.folderPath { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 16px;
+  line-height: 1;
+  margin-left: 8px;
+  border-radius: 3px;
+}
+
+.closeButton:hover {
+  background: var(--hover-bg);
+  color: var(--text-bright);
+}

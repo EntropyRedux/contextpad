@@ -1,0 +1,74 @@
+.container { display: flex; flex-direction: column; height: 100%; gap: 8px; }
+.toolbar { display: flex; gap: 4px; padding: 4px 0; border-bottom: 1px solid var(--border-default); align-items: center; }
+.toolbarButton { display: flex; align-items: center; gap: 4px; background: transparent; border: 1px solid var(--border-default); color: var(--text-primary); padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; transition: all 0.15s; height: 24px; }
+.toolbarButton:hover { background: var(--hover-bg); border-color: var(--text-muted); }
+.toolbarButton.active { background: var(--accent-muted); border-color: var(--accent); color: var(--accent); }
+.bulkCount { font-size: 11px; color: var(--accent); display: flex; align-items: center; padding: 0 4px; margin-left: auto; font-weight: 500; }
+.form { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--hover-bg); border: 1px solid var(--border-default); border-radius: 4px; }
+.input, .textarea, .select { background: var(--editor-bg); border: 1px solid var(--border-default); color: var(--text-primary); padding: 8px; border-radius: 3px; font-size: 13px; font-family: inherit; width: 100%; box-sizing: border-box; }
+.input:focus, .textarea:focus, .select:focus { outline: none; border-color: var(--accent); }
+.selectWrapper { position: relative; width: 100%; }
+.select { appearance: none; width: 100%; padding-right: 30px; }
+.selectChevron { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-muted); display: flex; align-items: center; }
+.customCategoryRow { display: flex; gap: 4px; align-items: center; }
+.smallIconBtn { background: transparent; border: 1px solid var(--border-default); color: var(--text-primary); padding: 4px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 28px; height: 32px; }
+.smallIconBtn:hover { background: var(--hover-bg); border-color: var(--accent); }
+.textarea { resize: vertical; line-height: 1.5; }
+.formButtons { display: flex; gap: 8px; margin-top: 4px; }
+.primaryButton, .secondaryButton { padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; transition: all 0.15s; }
+.primaryButton { background: var(--accent); color: var(--accent-fg); }
+.primaryButton:hover { background: var(--accent-hover); }
+.secondaryButton { background: transparent; color: var(--text-primary); border: 1px solid var(--border-default); }
+.secondaryButton:hover { background: var(--hover-bg); }
+.list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.emptyState { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; padding: 40px 20px; }
+.emptyState p { margin: 8px 0; }
+.emptyHint { font-size: 12px; opacity: 0.7; }
+.categoryGroup { margin-bottom: 4px; }
+.categoryHeader { padding: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); background: var(--hover-bg); user-select: none; display: flex; align-items: center; transition: background 0.1s; border-bottom: 1px solid var(--border-subtle); }
+.categoryTitleArea { display: flex; align-items: center; gap: 4px; padding: 6px 8px; cursor: pointer; }
+.categoryActions { display: flex; align-items: center; gap: 4px; padding-right: 8px; margin-left: auto; }
+.categoryHeader:hover .categoryActions .actionButton { opacity: 1; }
+.categoryActions .actionButton { opacity: 0; transition: opacity 0.1s; }
+.categoryCount { font-size: 10px; opacity: 0.7; font-weight: normal; min-width: 16px; text-align: right; }
+.item { display: flex; align-items: center; padding: 4px 8px; gap: 8px; cursor: default; transition: background 0.1s; border-radius: 4px; }
+.item:hover { background: var(--hover-bg); }
+.itemHidden { display: flex; align-items: center; padding: 4px 8px; gap: 8px; opacity: 0.5; border-radius: 4px; }
+.selectionCheckbox { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 2px; }
+.itemIcon { display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 24px; height: 24px; background: var(--hover-bg); border-radius: 4px; color: var(--accent); flex-shrink: 0; padding: 0 4px; }
+.itemInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.itemName { font-size: 12px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.itemPreview { font-size: 10px; color: var(--text-disabled); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.itemActions { display: flex; gap: 2px; align-items: center; opacity: 0; transition: opacity 0.1s; }
+.item:hover .itemActions, .itemHidden:hover .itemActions { opacity: 1; }
+.hiddenBadge { font-size: 9px; color: var(--text-muted); border: 1px solid var(--border-default); padding: 0 4px; border-radius: 2px; margin-left: 6px; display: inline-block; }
+.typeBadge { display: inline-flex; align-items: center; justify-content: center; padding: 2px; background: var(--hover-bg); border: 1px solid var(--border-default); border-radius: 4px; color: var(--accent); margin-right: 4px; vertical-align: middle; }
+.actionButton { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 2px; border-radius: 3px; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+.actionButton:hover { background: var(--hover-bg); color: var(--text-primary); }
+.playButton { composes: actionButton; color: var(--accent); }
+.playButton:hover { background: var(--accent-muted); color: var(--accent); }
+.deleteButton { composes: actionButton; }
+.deleteButton:hover { background: rgba(255, 107, 107, 0.15); color: #ff6b6b; }
+.separator { height: 1px; background: var(--border-default); margin: 12px 0; }
+.quickAddSection { margin-bottom: 12px; }
+.quickAddLabel { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--accent); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+.iconSection { display: flex; flex-direction: column; gap: 4px; }
+.iconGrid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.iconOption { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
+.iconOption:hover { background: var(--hover-bg); color: var(--text-primary); }
+.iconSelected { background: var(--accent-muted); border-color: var(--accent); color: var(--accent); }
+.codeTypeSelector { display: flex; gap: 4px; margin-bottom: 8px; }
+.codeTypeBtn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: transparent; border: 1px solid var(--border-default); color: var(--text-muted); border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+.codeTypeBtn:hover { background: var(--hover-bg); color: var(--text-primary); }
+.codeTypeBtn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--text-bright); }
+.formulaBuilder { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); border-radius: 4px; }
+.functionInfo { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border-subtle); }
+.functionExample { font-size: 11px; color: var(--text-muted); }
+.functionExample code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: #10b981; }
+.inputSourceSelector { display: flex; gap: 16px; font-size: 12px; color: var(--text-primary); }
+.inputSourceSelector label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.applyFormulaBtn { padding: 8px 12px; background: #10b981; border: none; border-radius: 4px; color: white; font-size: 12px; cursor: pointer; transition: background 0.15s; }
+.applyFormulaBtn:hover { background: #059669; }
+.formulaPreview { display: flex; flex-direction: column; gap: 4px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; }
+.previewLabel { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+.previewCode { font-size: 12px; color: #10b981; word-break: break-all; }

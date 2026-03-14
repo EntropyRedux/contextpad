@@ -1,0 +1,103 @@
+.contextMenu {
+  position: fixed;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  min-width: 180px;
+  z-index: 10000;
+}
+
+.contextMenu button {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.1s;
+}
+
+.contextMenu button:hover {
+  background: var(--hover-bg);
+}
+
+.contextMenu button:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.separator {
+  height: 1px;
+  background: var(--border-default);
+  margin: 4px 0;
+}
+
+.formHeader {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  background: var(--editor-bg);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  padding: 6px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.formButtons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.primaryButton {
+  flex: 1;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.primaryButton:hover {
+  background: var(--accent-hover);
+}
+
+.secondaryButton {
+  flex: 1;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.secondaryButton:hover {
+  background: var(--hover-bg);
+}

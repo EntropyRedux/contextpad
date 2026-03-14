@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-02-21T09:11:28.471Z",
+  "actions": [
+    {
+      "id": "2bfdce25-2830-44ca-8f3d-d96a3210c6ba",
+      "name": " Clear YAML Blocks",
+      "description": "Scans the entire document and removes all YAML code blocks, including the ```yaml fences, markers, and their content.",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst result = [];\nlet inYaml = false;\n\nfor (const line of lines) {\n  const trimmed = line.trim();\n\n  if (!inYaml && trimmed.startsWith('```yaml')) {\n    inYaml = true;\n    continue;\n  }\n\n  if (inYaml && trimmed.startsWith('```')) {\n    inYaml = false;\n    continue;\n  }\n\n  if (!inYaml) {\n    result.push(line);\n  }\n}\n\nhelpers.replaceAllText(result.join('\\n'));",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1770489775230,
+      "updatedAt": 1771481007056
+    },
+    {
+      "id": "27580069-077b-459c-9700-f6604dc58a3f",
+      "name": "Copy Next YAML Content",
+      "description": "Finds the first YAML block located below the cursor's current position and copies its content to the clipboard (excludes the fences).",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst startLine = textBeforeCursor.split('\\n').length;\nlet recording = false;\nconst content = [];\n\nfor (let i = startLine - 1; i < lines.length; i++) {\n  const line = lines[i];\n  if (!recording && line.trim().startsWith('```yaml')) {\n    recording = true;\n    continue;\n  }\n  if (recording) {\n    if (line.trim().startsWith('```')) break;\n    content.push(line);\n  }\n}\n\nif (content.length > 0) {\n  helpers.copyToClipboard(content.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1770489775230,
+      "updatedAt": 1771481011350
+    },
+    {
+      "id": "fe8dc0eb-c214-40e7-a662-83a12b91fb33",
+      "name": " Clear YAML Values",
+      "description": "Preserves the YAML structure (fences and keys) but deletes all values after the colons and list markers.",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nlet inYaml = false;\nconst result = lines.map((line) => {\n  const trimmed = line.trim();\n\n  if (trimmed.startsWith('```yaml')) {\n    inYaml = true;\n    return line;\n  }\n\n  if (inYaml && trimmed.startsWith('```')) {\n    inYaml = false;\n    return line;\n  }\n\n  if (!inYaml) return line;\n\n  const colonIndex = line.indexOf(':');\n  if (colonIndex !== -1) {\n    return line.substring(0, colonIndex + 1);\n  }\n\n  const dashIndex = line.indexOf('-');\n  if (dashIndex !== -1 && line.substring(dashIndex).trim().startsWith('- ')) {\n    return line.substring(0, dashIndex + 1) + ' ';\n  }\n\n  return line;\n});\n\nhelpers.replaceAllText(result.join('\\n'));",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1770489775230,
+      "updatedAt": 1771481015907
+    },
+    {
+      "id": "e51f73a4-1a8c-4e4e-a172-6ae4e4365d16",
+      "name": "Copy Next YAML Values",
+      "description": "Finds the first YAML block below the cursor and copies only the values (as-is, no bracket stripping).",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst startLine = textBeforeCursor.split('\\n').length;\nlet recording = false;\nconst values = [];\n\nfor (let i = startLine - 1; i < lines.length; i++) {\n  const line = lines[i];\n  const trimmed = line.trim();\n\n  if (!recording && trimmed.startsWith('```yaml')) {\n    recording = true;\n    continue;\n  }\n\n  if (recording) {\n    if (trimmed.startsWith('```')) break;\n    if (!trimmed || trimmed.startsWith('#')) continue;\n\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      const val = line.substring(colonIndex + 1).trim();\n      if (val) values.push(val);\n    }\n  }\n}\n\nif (values.length > 0) {\n  helpers.copyToClipboard(values.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1770489775230,
+      "updatedAt": 1771481019919
+    },
+    {
+      "id": "3a7f21a8-75db-4abf-91c3-0ea8115b0a90",
+      "name": "Wrap in ''",
+      "description": "Executes SINGLEQUOTE formula to wrap selected text in single quotes.",
+      "type": "button",
+      "code": "FORMULA:SINGLEQUOTE()",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1770489775230,
+      "updatedAt": 1771481023480
+    },
+    {
+      "id": "e470baf6-badb-41fc-9ad7-9e80ddd7d501",
+      "name": "Reset ALL",
+      "description": "Resets [[...]] values to {{key}} placeholders across ALL YAML blocks in the document.",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nlet inYaml = false;\nconst result = lines.map((line) => {\n  const trimmed = line.trim();\n\n  if (trimmed.startsWith('```yaml')) {\n    inYaml = true;\n    return line;\n  }\n\n  if (inYaml && trimmed.startsWith('```')) {\n    inYaml = false;\n    return line;\n  }\n\n  if (!inYaml) return line;\n\n  const colonIndex = line.indexOf(':');\n  if (colonIndex === -1) return line;\n\n  const key = line.substring(0, colonIndex).trim();\n  return line.replace(/\\[\\[[\\s\\S]*?\\]\\]/, '[[' + '{{' + key + '}}' + ']]');\n});\n\nhelpers.replaceAllText(result.join('\\n'));",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1770489775230,
+      "updatedAt": 1771481109576
+    },
+    {
+      "id": "c3c882fc-5407-4c5c-bf81-cf46dada15b2",
+      "name": "CLEAR",
+      "description": "Resets [[...]] values to {{key}} placeholders in the first YAML block below the cursor.",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst cursorLine = textBeforeCursor.split('\\n').length;\nconst result = [...lines];\n\nlet targetStart = -1;\nlet targetEnd = -1;\nfor (let i = cursorLine; i < lines.length; i++) {\n  const trimmed = lines[i].trim();\n  if (trimmed.startsWith('```yaml')) {\n    targetStart = i;\n    for (let j = i + 1; j < lines.length; j++) {\n      if (lines[j].trim().startsWith('```')) {\n        targetEnd = j;\n        break;\n      }\n    }\n    break;\n  }\n}\n\nif (targetStart !== -1 && targetEnd !== -1) {\n  for (let i = targetStart + 1; i < targetEnd; i++) {\n    const line = lines[i];\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      const key = line.substring(0, colonIndex).trim();\n      result[i] = line.replace(/\\[\\[[\\s\\S]*?\\]\\]/, '[[' + '{{' + key + '}}' + ']]');\n    }\n  }\n  helpers.replaceAllText(result.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771480741792,
+      "updatedAt": 1771485408370
+    },
+    {
+      "id": "bf4589ec-fb46-4b1e-98ba-c8409f3ef6f2",
+      "name": "COPY",
+      "description": "Copies values from the first YAML block below the cursor, stripping [[ ]] brackets.",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst cursorLine = textBeforeCursor.split('\\n').length;\nconst vals = [];\n\nlet targetStart = -1;\nlet targetEnd = -1;\nfor (let i = cursorLine; i < lines.length; i++) {\n  const trimmed = lines[i].trim();\n  if (trimmed.startsWith('```yaml')) {\n    targetStart = i;\n    for (let j = i + 1; j < lines.length; j++) {\n      if (lines[j].trim().startsWith('```')) {\n        targetEnd = j;\n        break;\n      }\n    }\n    break;\n  }\n}\n\nif (targetStart !== -1 && targetEnd !== -1) {\n  for (let i = targetStart + 1; i < targetEnd; i++) {\n    const text = lines[i];\n    const colonIndex = text.indexOf(':');\n    if (colonIndex !== -1) {\n      let v = text.substring(colonIndex + 1).trim();\n      v = v.replace(/^\\[\\[/, '').replace(/\\]\\]$/, '');\n      if (v) vals.push(v);\n    }\n  }\n  if (vals.length > 0) helpers.copyToClipboard(vals.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771480741792,
+      "updatedAt": 1771484108499
+    }
+  ]
+}

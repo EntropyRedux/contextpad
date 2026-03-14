@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sandbox</title>
+</head>
+<body>
+<script>
+    // Listen for messages from the parent window
+    window.addEventListener('message', async (event) => {
+        // Simple origin check - only allow parent frame
+        if (event.source !== window.parent) return
+
+        const { id, code, context } = event.data
+        if (!id || !code) return
+
+        try {
+            // Reconstruct the helpers object with simple message passing for actions
+            const helpers = {
+                getSelection: () => context.selection,
+                getAllText: () => context.allText,
+                getLine: (n) => {
+                    const lines = context.allText.split('\n');
+                    if (n < 1 || n > lines.length) return '';
+                    return lines[n - 1];
+                },
+                getLines: () => context.allText.split('\n'),
+                getCursorPosition: () => context.cursorPosition,
+                getCurrentLine: () => context.currentLineText,
+                getLineCount: () => context.lineCount,
+                
+                // Mutation functions send messages back that we queue
+                replaceSelection: (text) => queueMutation({ type: 'replaceSelection', text }),
+                insertAtCursor: (text) => queueMutation({ type: 'insertAtCursor', text }),
+                replaceAllText: (text) => queueMutation({ type: 'replaceAllText', text }),
+                setCursorPosition: (pos) => queueMutation({ type: 'setCursorPosition', pos }),
+                copyToClipboard: (text) => queueMutation({ type: 'copyToClipboard', text: String(text ?? '') }),
+                // Legacy aliases for older custom action code
+                toCopy: (text) => queueMutation({ type: 'copyToClipboard', text: String(text ?? '') }),
+                copy: (text) => queueMutation({ type: 'copyToClipboard', text: String(text ?? '') })
+            }
+
+            // Compatibility shim for legacy actions still calling navigator.clipboard.writeText(...)
+            const navigatorShim = {
+                clipboard: {
+                    writeText: (text) => {
+                        queueMutation({ type: 'copyToClipboard', text: String(text ?? '') })
+                        return Promise.resolve()
+                    }
+                }
+            }
+            
+            // Allow basic logging
+            const consoleInterceptor = {
+                log: (...args) => queueMutation({ type: 'log', args }),
+                error: (...args) => queueMutation({ type: 'error', args })
+            }
+
+            let mutations = []
+            function queueMutation(mutation) {
+                mutations.push(mutation)
+            }
+
+            // Create sandboxed function
+            // We do NOT expose window, document, or global APIs easily here
+            const fn = new Function('helpers', 'console', 'navigator', `
+                "use strict";
+                try {
+                    ${code}
+                } catch(e) {
+                    throw e;
+                }
+            `)
+
+            // Execute the user's code
+            fn(helpers, consoleInterceptor, navigatorShim)
+            
+            // Return success with any pending mutations
+            event.source.postMessage({ id, success: true, mutations }, event.origin)
+            
+        } catch (error) {
+            // Return error
+            event.source.postMessage({ 
+                id, 
+                success: false, 
+                error: error instanceof Error ? error.message : String(error) 
+            }, event.origin)
+        }
+    })
+</script>
+</body>
+</html>

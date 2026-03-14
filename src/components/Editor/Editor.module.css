@@ -1,0 +1,176 @@
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.editor {
+  height: 100%;
+  width: 100%;
+  background: var(--editor-bg);
+  color: var(--text-primary);
+}
+
+.editor :global(.cm-editor) {
+  height: 100%;
+  background: var(--editor-bg);
+  color: var(--text-primary);
+}
+
+.editor :global(.cm-scroller) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: 100%;
+}
+
+.editor :global(.cm-scroller)::-webkit-scrollbar { width: 14px; }
+.editor :global(.cm-scroller)::-webkit-scrollbar-track { background: var(--editor-bg); }
+.editor :global(.cm-scroller)::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 7px;
+  border: 3px solid var(--editor-bg);
+}
+.editor :global(.cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+.editor :global(.cm-scroller) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--editor-bg);
+}
+
+.editor :global(.cm-content) {
+  padding: 8px;
+  line-height: 1.4;
+}
+
+.editor :global(.cm-line) { padding: 0 4px; }
+
+.editor :global(.cm-gutters) {
+  background: var(--editor-bg);
+  border-right: 1px solid var(--border-default);
+  color: var(--text-muted);
+}
+
+.editor :global(.cm-activeLineGutter) { background: var(--editor-active-line); }
+.editor :global(.cm-activeLine)       { background: var(--editor-active-line); }
+
+.editor :global(.cm-selectionBackground)                 { background: var(--editor-selection) !important; }
+.editor :global(.cm-focused .cm-selectionBackground)     { background: var(--editor-selection) !important; }
+
+.editor :global(.cm-cursor) { border-left-color: var(--editor-cursor); }
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: var(--text-muted);
+  font-size: 14px;
+  background: var(--editor-bg);
+}
+
+/* Hide native CodeMirror search panel */
+.editor :global(.cm-panels-top),
+.editor :global(.cm-panels-bottom) { display: none !important; }
+.editor :global(.cm-panel.cm-search) { display: none !important; }
+
+/* Search match highlighting — semantic, stays consistent */
+.editor :global(.cm-searchMatch) {
+  background-color: rgba(255, 213, 0, 0.4) !important;
+  border-radius: 2px;
+}
+.editor :global(.cm-searchMatch-selected) {
+  background-color: rgba(255, 150, 0, 0.6) !important;
+  border-radius: 2px;
+}
+.editor :global(.cm-selectionMatch) {
+  background-color: rgba(173, 214, 255, 0.3) !important;
+}
+
+/* Action Button Widget — semantic cyan, content indicator */
+.editor :global(.cm-action-button) {
+  background: rgba(0, 122, 204, 0.15);
+  color: #4cc9f0;
+  border: 1px solid rgba(0, 122, 204, 0.3);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  margin: 0 2px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  user-select: none;
+}
+.editor :global(.cm-action-button::before) { content: '⚡'; font-size: 9px; opacity: 0.8; }
+.editor :global(.cm-action-button:hover) {
+  background: rgba(0, 122, 204, 0.25);
+  border-color: #4cc9f0;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(76, 201, 240, 0.2);
+}
+.editor :global(.cm-action-button:active) {
+  transform: translateY(1px);
+  background: rgba(0, 122, 204, 0.4);
+}
+.editor :global(.cm-action-error) {
+  background: rgba(244, 67, 54, 0.1) !important;
+  color: #f44336 !important;
+  border-color: rgba(244, 67, 54, 0.3) !important;
+}
+.editor :global(.cm-action-error::before) { content: '⚠'; }
+
+/* Template Variable — semantic blue, content indicator */
+.editor :global(.cm-template-variable) {
+  background: rgba(59, 130, 246, 0.1);
+  border-bottom: 2px solid #3b82f6;
+  padding: 0 2px;
+  border-radius: 2px;
+  color: #60a5fa;
+}
+
+/* Inline Formula — semantic green, content indicator */
+.editor :global(.cm-inline-formula) {
+  background: rgba(16, 185, 129, 0.15);
+  border-radius: 3px;
+  padding: 1px 2px;
+  color: #10b981;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+.editor :global(.cm-inline-formula.cm-formula-error) {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-bottom: 2px wavy #ef4444;
+}
+
+/* Formula Run Button */
+.editor :global(.cm-formula-run-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
+  padding: 0;
+  background: #10b981;
+  border: none;
+  border-radius: 3px;
+  color: white;
+  font-size: 10px;
+  cursor: pointer;
+  vertical-align: middle;
+  opacity: 0.8;
+  transition: all 0.15s ease;
+}
+.editor :global(.cm-formula-run-btn:hover) {
+  opacity: 1;
+  background: #059669;
+  transform: scale(1.1);
+}
+.editor :global(.cm-formula-run-btn:active) { transform: scale(0.95); }
