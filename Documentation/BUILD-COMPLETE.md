@@ -186,7 +186,7 @@ Build: Release (optimized)
 
 ### Development Mode
 ```bash
-cd c:\Users\mbula\Projects\Repo\ContextPad\dev\contextpad-tauri-vscode\initial-dev\contextpad
+cd <repo-root>
 npm run tauri:dev
 ```
 
