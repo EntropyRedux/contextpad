@@ -5,7 +5,6 @@ import { python } from '@codemirror/lang-python'
 import { html } from '@codemirror/lang-html'
 import { css } from '@codemirror/lang-css'
 import { yaml } from '@codemirror/lang-yaml'
-import { languages } from '@codemirror/language-data'
 import type { Extension } from '@codemirror/state'
 
 /**
@@ -16,8 +15,7 @@ export function getLanguageExtension(language: string): Extension {
     case 'markdown':
     case 'md':
       return markdown({
-        base: markdownLanguage,
-        codeLanguages: languages
+        base: markdownLanguage
       })
 
     case 'json':
@@ -62,8 +60,7 @@ export function getLanguageExtension(language: string): Extension {
     default:
       // Default to markdown
       return markdown({
-        base: markdownLanguage,
-        codeLanguages: languages
+        base: markdownLanguage
       })
   }
 }

@@ -89,19 +89,6 @@ export function MarkdownOutline() {
     // Initial parse
     parseOutlineContent(editorView, true)
 
-    // Create update listener for document changes
-    const updateListener = EditorView.updateListener.of((update) => {
-      if (update.docChanged) {
-        debouncedParse(update.view)
-      }
-    })
-
-    // Add the listener extension to the editor
-    editorView.dispatch({
-      effects: (editorView as unknown as { state: { facet: (f: unknown) => unknown[] } })
-        .state.facet ? undefined : undefined
-    })
-
     // Store a reference to handle content changes via DOM observer as fallback
     // This ensures we catch changes even if the extension isn't applied
     let observer: MutationObserver | null = null

@@ -3,7 +3,7 @@ import { useTabStore } from '../../store/tabStore'
 import { useShallow } from 'zustand/react/shallow'
 import { useNotificationStore } from '../../store/notificationStore'
 import { invoke } from '@tauri-apps/api/core'
-import { Folder, File, ChevronRight, ArrowLeft, MoreHorizontal, Save, Edit2 } from 'lucide-react'
+import { Folder, File, ChevronRight, ArrowLeft, Save, Edit2 } from 'lucide-react'
 import styles from './Breadcrumb.module.css'
 
 interface FileNode {

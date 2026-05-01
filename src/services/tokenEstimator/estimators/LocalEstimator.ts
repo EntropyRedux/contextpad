@@ -5,7 +5,7 @@
  * Falls back to cl100k_base if specific encoding unavailable
  */
 
-import { getEncoding, Tiktoken } from 'js-tiktoken'
+import type { Tiktoken } from 'js-tiktoken'
 import type { ModelDefinition, TiktokenEncoding } from '../models'
 import type { IEstimator, EstimatorResult } from './types'
 import { EstimatorError } from './types'
@@ -13,15 +13,24 @@ import { EstimatorError } from './types'
 export class LocalEstimator implements IEstimator {
   // Cache encoder instances to avoid re-initialization
   private encoderCache = new Map<TiktokenEncoding, Tiktoken>()
+  private tiktokenModulePromise: Promise<typeof import('js-tiktoken')> | null = null
+
+  private async getTiktokenModule() {
+    if (!this.tiktokenModulePromise) {
+      this.tiktokenModulePromise = import('js-tiktoken')
+    }
+    return this.tiktokenModulePromise
+  }
 
   /**
    * Get or create an encoder for the specified encoding
    */
-  private getEncoder(encoding: TiktokenEncoding): Tiktoken {
+  private async getEncoder(encoding: TiktokenEncoding): Promise<Tiktoken> {
     let encoder = this.encoderCache.get(encoding)
 
     if (!encoder) {
       try {
+        const { getEncoding } = await this.getTiktokenModule()
         encoder = getEncoding(encoding)
         this.encoderCache.set(encoding, encoder)
       } catch (error) {
@@ -30,6 +39,7 @@ export class LocalEstimator implements IEstimator {
 
         encoder = this.encoderCache.get('cl100k_base')
         if (!encoder) {
+          const { getEncoding } = await this.getTiktokenModule()
           encoder = getEncoding('cl100k_base')
           this.encoderCache.set('cl100k_base', encoder)
         }
@@ -58,7 +68,7 @@ export class LocalEstimator implements IEstimator {
     }
 
     try {
-      const encoder = this.getEncoder(model.encoding)
+      const encoder = await this.getEncoder(model.encoding)
       const tokens = encoder.encode(content)
 
       return {
@@ -83,7 +93,7 @@ export class LocalEstimator implements IEstimator {
    */
   async estimatePartial(content: string, encoding: TiktokenEncoding = 'o200k_base'): Promise<number> {
     try {
-      const encoder = this.getEncoder(encoding)
+      const encoder = await this.getEncoder(encoding)
       const tokens = encoder.encode(content)
       return tokens.length
     } catch (error) {

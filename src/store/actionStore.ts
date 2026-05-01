@@ -198,14 +198,17 @@ export const useActionStore = create<ActionState>((set, get) => {
 
     addActionsBulk: (newActions) => {
       set((state) => {
-        // Ensure IDs
-        const processed = newActions.map(a => ({
-          ...normalizeAction(a),
-          type: a.type === 'button' ? 'button' : 'command',
+        // Ensure IDs and correct types
+        const processed: Action[] = newActions.map(a => ({
+          ...a,
+          code: normalizeActionCode(a.code),
+          type: (a.type === 'button' ? 'button' : 'command') as ActionType,
           enabled: a.enabled !== false,
           id: a.id || crypto.randomUUID(),
           category: (a.category || 'GENERAL').toUpperCase(),
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
+          isDefault: a.isDefault || false,
+          createdAt: a.createdAt || Date.now()
         }))
         
         const actions = [...state.actions, ...processed]

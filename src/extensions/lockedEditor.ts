@@ -238,13 +238,13 @@ const lockedBlockFilter = EditorState.transactionFilter.of((tr) => {
 
     ranges.locked.between(fromA, toA, (from, to, value) => {
       isLocked = true
-      currentLockedRange = { from, to, value }
+      currentLockedRange = { from, to, value: value as LockedRangeValue }
       return false 
     })
 
     if (!isLocked) return 
 
-    if (currentLockedRange && currentLockedRange.value.exclusions.length > 0) {
+    if (currentLockedRange && (currentLockedRange as any).value.exclusions.length > 0) {
       let isAllowed = false
       ranges.allowed.between(fromA, toA, (allowFrom, allowTo) => {
         if (fromA >= allowFrom && toA <= allowTo) {

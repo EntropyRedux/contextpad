@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { useTabStore } from '../../store/tabStore'
 import { useShallow } from 'zustand/react/shallow'
 import { useNotificationStore } from '../../store/notificationStore'
 import { THEMES } from '../../themes/themeRegistry'
 import { Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
-import { TokenSettings } from './TokenSettings'
 import { useSettingsStore } from '../../store/settingsStore'
 import type { AppTheme, AccentColor } from '../../store/settingsStore'
 import styles from './SettingsPanel.module.css'
+
+const TokenSettings = lazy(() => import('./TokenSettings').then(module => ({ default: module.TokenSettings })))
 
 const THEME_SWATCHES: { id: AppTheme; label: string; bar: string; body: string; text: string }[] = [
   { id: 'charcoal', label: 'Char',   bar: '#007acc', body: '#1e1e1e', text: '#cccccc' },
@@ -500,7 +501,9 @@ export function SettingsPanel() {
 
       {/* Token Calculation Section */}
       <CollapsibleSection title="Token Calculation" defaultOpen={false}>
-        <TokenSettings />
+        <Suspense fallback={<p className={styles.hint}>Loading token settings…</p>}>
+          <TokenSettings />
+        </Suspense>
       </CollapsibleSection>
 
       {/* Preview & Export Section */}

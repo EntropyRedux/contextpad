@@ -26,7 +26,7 @@ const ICONS = {
 }
 
 // --- RENDERER ---
-const renderItem = (completion: Completion, state: any, type: 'CMD' | 'BTN' | 'TMPL') => {
+const renderItem = (completion: Completion, _state: any, type: 'CMD' | 'BTN' | 'TMPL') => {
   const dom = document.createElement('div')
   dom.className = 'cm-slash-item'
 
@@ -52,7 +52,7 @@ const renderItem = (completion: Completion, state: any, type: 'CMD' | 'BTN' | 'T
 
   // Badge
   const badge = document.createElement('span')
-  badge.className = `cm-slash-badge ${type.toLowerCase()}`
+  badge.className = 'cm-slash-badge'
   badge.textContent = type
 
   dom.appendChild(icon)
@@ -60,6 +60,10 @@ const renderItem = (completion: Completion, state: any, type: 'CMD' | 'BTN' | 'T
   dom.appendChild(badge)
 
   return dom
+}
+
+interface SlashCompletion extends Completion {
+  typeLabel?: 'CMD' | 'BTN' | 'TMPL'
 }
 
 /**
@@ -84,7 +88,7 @@ function getSlashCompletions(): Completion[] {
       // Custom Render Logic
       typeLabel, // Custom property for our renderer if needed, but we bind it below
 
-      apply: async (view: EditorView, completion: Completion, from: number, to: number) => {
+      apply: async (view: EditorView, _completion: Completion, from: number, to: number) => {
         try {
           if (isButton) {
             view.dispatch({
@@ -130,8 +134,9 @@ function getSlashCompletions(): Completion[] {
         } catch (err) {
           console.error('Error applying action:', err)
         }
-      }
-    })
+      },
+      render: (completion: Completion, state: any) => renderItem(completion, state, typeLabel)
+    } as SlashCompletion)
   })
 
   // Get visible templates
@@ -143,8 +148,9 @@ function getSlashCompletions(): Completion[] {
       info: template.variables.length > 0 ? `Vars: ${template.variables.join(', ')}` : '',
       type: 'text',
       boost: 0,
+      typeLabel: 'TMPL',
 
-      apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+      apply: (view: EditorView, _completion: Completion, from: number, to: number) => {
         try {
           const processed = processTemplateVariables(template.content, '')
 
@@ -164,8 +170,9 @@ function getSlashCompletions(): Completion[] {
         } catch (err) {
           console.error('Error applying template:', err)
         }
-      }
-    })
+      },
+      render: (completion: Completion, state: any) => renderItem(completion, state, 'TMPL')
+    } as SlashCompletion)
   })
 
   return completions

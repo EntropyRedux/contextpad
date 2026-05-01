@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { EditorView } from '@codemirror/view'
 import { indexedDBStorage } from '../services/storage/IndexedDBStorage'
 import welcomeContent from '../data/WELCOME.md?raw'
 
@@ -11,7 +12,7 @@ export interface Tab {
   isDirty: boolean
   language: 'markdown' | string
   lastModifiedTime?: number
-  editorView?: unknown // EditorView reference for outline parsing (not persisted)
+  editorView?: EditorView | null // EditorView reference for outline parsing (not persisted)
   pinnedTabId?: string // If set, this tab is from a pinned workflow and should be locked
 }
 
@@ -278,14 +279,11 @@ const loadMetadataFromLocalStorage = () => {
     if (savedState) {
       const parsed = JSON.parse(savedState)
 
-      // SAFETY RESET: Force disable spell checker and reset indexing scope
-      // to prevent app hang from problematic settings combination
+      // Rehydrate persisted settings, falling back to defaults only for missing values.
+      // Avoid forcing user preferences back to safe defaults on every restart.
       const safeViewSettings = {
         ...defaultViewSettings,
-        ...parsed.viewSettings,
-        // Force these settings to safe defaults on every load
-        enableSpellCheck: false,
-        indexingScope: 'performance' as const
+        ...parsed.viewSettings
       }
 
       // Ensure pinned tabs have categories
@@ -333,6 +331,7 @@ const defaultPinnedTabs: PinnedTab[] = [
     id: 'welcome-workflow',
     name: 'Welcome Guide',
     icon: 'BookOpen',
+    type: 'workflow',
     content: welcomeContent,
     category: 'Help',
     createdAt: Date.now()

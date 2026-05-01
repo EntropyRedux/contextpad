@@ -166,7 +166,8 @@ export function getModelsGroupedByProvider(): Record<ModelProvider, ModelDefinit
   return {
     openai: getModelsByProvider('openai'),
     anthropic: getModelsByProvider('anthropic'),
-    google: getModelsByProvider('google')
+    google: getModelsByProvider('google'),
+    custom: getModelsByProvider('custom')
   }
 }
 

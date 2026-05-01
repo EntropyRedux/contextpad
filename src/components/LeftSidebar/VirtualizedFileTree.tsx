@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect, memo } from 'react'
-import { FixedSizeList as List } from 'react-window'
+import * as RW from 'react-window'
+const List = (RW as any).FixedSizeList
 import { invoke } from '@tauri-apps/api/core'
 import { ContextMenu, ContextMenuItem } from '../shared/ContextMenu'
 import styles from './FileTreeItem.module.css'

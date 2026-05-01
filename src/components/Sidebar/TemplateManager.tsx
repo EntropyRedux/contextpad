@@ -158,7 +158,7 @@ export function TemplateManager() {
       addNotification({ type: 'warning', message: 'No selection' })
       return
     }
-    setFormData({ name: '', content: selectedText, category: 'General' })
+    setFormData({ id: '', name: '', content: selectedText, category: 'General' })
     setShowAddForm(true)
   }
 

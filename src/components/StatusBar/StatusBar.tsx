@@ -4,12 +4,8 @@ import { useTabStore } from '../../store/tabStore'
 import { useNotificationStore } from '../../store/notificationStore'
 import { useSettingsStore } from '../../store/settingsStore'
 import { statistics, DocumentStats } from '../../services/statisticsService'
-import {
-  tokenEstimator,
-  TokenEstimatorState,
-  MODEL_REGISTRY,
-  getModelById
-} from '../../services/tokenEstimator'
+import type { TokenEstimatorState } from '../../services/tokenEstimator/TokenEstimatorService'
+import { getModelById } from '../../services/tokenEstimator/models'
 import { resolveModel, calculateUsageStats } from '../../utils/tokenUtils'
 import { TokenStatsPopup } from './TokenStatsPopup'
 import styles from './StatusBar.module.css'
@@ -32,7 +28,16 @@ export function StatusBar() {
   const [basicStats, setBasicStats] = useState<DocumentStats | null>(null)
 
   // Token estimator state (event-based)
-  const [tokenState, setTokenState] = useState<TokenEstimatorState>(tokenEstimator.getState())
+  const [tokenState, setTokenState] = useState<TokenEstimatorState>({
+    status: 'idle',
+    tokens: null,
+    cost: null,
+    method: null,
+    cached: false,
+    error: null,
+    model: null,
+    isApproximate: false
+  })
 
   const [showStatsModal, setShowStatsModal] = useState(false)
 
@@ -45,8 +50,20 @@ export function StatusBar() {
 
   // Subscribe to token estimator state changes
   useEffect(() => {
-    const unsubscribe = tokenEstimator.subscribe(setTokenState)
-    return unsubscribe
+    let unsubscribe = () => {}
+    let cancelled = false
+
+    ;(async () => {
+      const { tokenEstimator } = await import('../../services/tokenEstimator')
+      if (cancelled) return
+      setTokenState(tokenEstimator.getState())
+      unsubscribe = tokenEstimator.subscribe(setTokenState)
+    })()
+
+    return () => {
+      cancelled = true
+      unsubscribe()
+    }
   }, [])
 
   // Transient pulsing animation when document is modified
@@ -65,16 +82,16 @@ export function StatusBar() {
       setBasicStats(statistics.calculateStats(activeTab.content))
 
       // Token calculation (async, debounced internally by tokenEstimator)
-      tokenEstimator.calculate(
-        activeTab.content,
-        tokenSettings.selectedModel,
-        indexingScope
-      )
+      void import('../../services/tokenEstimator').then(({ tokenEstimator }) => {
+        tokenEstimator.calculate(activeTab.content, tokenSettings.selectedModel, indexingScope)
+      })
     } else {
       setBasicStats(null)
-      tokenEstimator.reset()
+      void import('../../services/tokenEstimator').then(({ tokenEstimator }) => {
+        tokenEstimator.reset()
+      })
     }
-  }, [activeTab?.content, indexingScope])
+  }, [activeTab?.content, indexingScope, tokenSettings.selectedModel])
 
   // Force immediate recalculation when model changes
   useEffect(() => {
@@ -82,11 +99,9 @@ export function StatusBar() {
       prevModelRef.current = tokenSettings.selectedModel
 
       if (activeTab?.content) {
-        tokenEstimator.calculateImmediate(
-          activeTab.content,
-          tokenSettings.selectedModel,
-          indexingScope
-        )
+        void import('../../services/tokenEstimator').then(({ tokenEstimator }) => {
+          tokenEstimator.calculateImmediate(activeTab.content, tokenSettings.selectedModel, indexingScope)
+        })
       }
     }
   }, [tokenSettings.selectedModel, activeTab?.content, indexingScope])

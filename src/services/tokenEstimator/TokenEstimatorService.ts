@@ -102,7 +102,7 @@ export interface TokenEstimatorState {
   status: EstimatorStatus
   tokens: number | null
   cost: number | null
-  method: 'local' | 'online' | null
+  method: 'local' | 'online' | 'custom' | null
   cached: boolean
   error: string | null
   model: string | null

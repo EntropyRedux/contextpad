@@ -9,7 +9,7 @@ import type { ModelDefinition } from '../models'
  */
 export interface EstimatorResult {
   tokens: number
-  method: 'local' | 'online'
+  method: 'local' | 'online' | 'custom'
   model: string
   cached: boolean
 }
@@ -25,6 +25,7 @@ export type EstimatorErrorCode =
   | 'MODEL_NOT_FOUND'
   | 'INVALID_REQUEST'
   | 'ENCODING_ERROR'
+  | 'CALCULATION_ERROR'
   | 'UNKNOWN_ERROR'
 
 export class EstimatorError extends Error {

@@ -197,6 +197,18 @@ export function extractCodeBlockInfo(infoString: string): ParsedCodeBlock {
 }
 
 // =============================================================================
+// Regex & Detection
+// =============================================================================
+
+export const CODE_BLOCK_HEADER_REGEX = /^(`{3,}|~{3,})(.*?)(?:\s*\{(.*)\})?\s*$/
+
+export function isCodeBlockHeaderWithParams(line: string): boolean {
+  const trimmed = line.trim()
+  const match = trimmed.match(CODE_BLOCK_HEADER_REGEX)
+  return !!(match && match[3] && match[3].trim())
+}
+
+// =============================================================================
 // Serializer
 // =============================================================================
 

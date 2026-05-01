@@ -188,21 +188,22 @@ export function usePreviewSync() {
     settings.previewTheme,
     settings.previewShowTOC,
     settings.theme
-  ])
+  ]);
 
   // Sync Settings in real-time (Fast path)
   useEffect(() => {
     if (showLivePreview && previewWindowRef.current) {
-      const settingsJson = JSON.stringify({
+      const settingsData = {
         previewFontScale: settings.previewFontScale,
         previewMaxWidth: settings.previewMaxWidth,
         previewContentMargin: settings.previewContentMargin,
         previewCustomCSS: settings.previewCustomCSS
-      })
+      };
+      const sJson = JSON.stringify(settingsData);
       
       // Use eval for instant cross-window sync
-      previewWindowRef.current.eval(`window.updatePreviewSettings(${settingsJson})`)
-        .catch(err => console.warn('Real-time sync failed:', err))
+      (previewWindowRef.current as any).eval(`window.updatePreviewSettings(${sJson})`)
+        .catch((err: any) => console.warn('Real-time sync failed:', err));
     }
   }, [
     settings.previewFontScale,

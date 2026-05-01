@@ -10,7 +10,7 @@
 
 export interface CachedResult {
   tokens: number
-  method: 'local' | 'online'
+  method: 'local' | 'online' | 'custom'
   model: string
   cost: number
   timestamp: number

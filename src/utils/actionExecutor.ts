@@ -8,6 +8,7 @@ import { executeFormula, validateFormula, setEditorContext, type EditorContext }
 import type { EditorView } from '@codemirror/view'
 import { detectCodeBlocks } from './codeBlockDetection'
 import { getParamAsString } from './codeBlockParams'
+import { isInternalFilterBypass } from '../extensions/lockedEditor'
 
 export interface ExecutionResult {
   success: boolean
@@ -208,6 +209,69 @@ function executeFormulaAction(
  * Automatically filters out content from blocks that exclude this actionId
  */
 export function getEditorHelpers(view: EditorView, actionId?: string) {
+  const getExcludedBlocksForAction = () => {
+    if (!actionId) return []
+
+    const docText = view.state.doc.toString()
+    const blocks = detectCodeBlocks(docText)
+
+    return blocks.filter(block => {
+      const excludeParam = getParamAsString(block.parameters, 'exclude', '')
+      const exclusions = excludeParam.split(',').map(s => s.trim())
+      return exclusions.some(ex => ex === `action:${actionId}`)
+    })
+  }
+
+  const preserveExcludedLines = (nextText: string): string => {
+    if (!actionId) return nextText
+
+    const originalLines = view.state.doc.toString().split('\n')
+    const nextLines = nextText.split('\n')
+
+    while (nextLines.length < originalLines.length) {
+      nextLines.push('')
+    }
+
+    for (const block of getExcludedBlocksForAction()) {
+      const start = Math.max(0, block.startLine - 1)
+      const end = Math.min(nextLines.length - 1, block.endLine - 1)
+
+      for (let i = start; i <= end; i++) {
+        if (originalLines[i] !== undefined && nextLines[i] !== undefined) {
+          nextLines[i] = originalLines[i]
+        }
+      }
+    }
+
+    return nextLines.join('\n')
+  }
+
+  const intersectsExcludedRange = (from: number, to: number): boolean => {
+    if (!actionId) return false
+
+    for (const block of getExcludedBlocksForAction()) {
+      const blockFrom = view.state.doc.line(block.startLine).from
+      const blockTo = view.state.doc.line(block.endLine).to
+
+      const intersects = from < blockTo && to > blockFrom
+      const insertAt = from === to && from >= blockFrom && from <= blockTo
+
+      if (intersects || insertAt) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  const dispatchTextReplacement = (text: string) => {
+    const nextText = actionId ? preserveExcludedLines(text) : text
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: nextText },
+      annotations: actionId ? [isInternalFilterBypass.of(true)] : undefined
+    })
+  }
+
   // Helper to get text with excluded blocks redacted
   const getFilteredText = () => {
     const docText = view.state.doc.toString()
@@ -258,6 +322,7 @@ export function getEditorHelpers(view: EditorView, actionId?: string) {
 
     replaceSelection: (text: string) => {
       const selection = view.state.selection.main
+      if (intersectsExcludedRange(selection.from, selection.to)) return
       view.dispatch({
         changes: { from: selection.from, to: selection.to, insert: text }
       })
@@ -265,6 +330,7 @@ export function getEditorHelpers(view: EditorView, actionId?: string) {
 
     insertAtCursor: (text: string) => {
       const pos = view.state.selection.main.head
+      if (intersectsExcludedRange(pos, pos)) return
       view.dispatch({
         changes: { from: pos, insert: text },
         selection: { anchor: pos + text.length }
@@ -289,9 +355,7 @@ export function getEditorHelpers(view: EditorView, actionId?: string) {
     },
 
     replaceAllText: (text: string) => {
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: text }
-      })
+      dispatchTextReplacement(text)
     },
 
     copyToClipboard,
@@ -305,6 +369,7 @@ export function getEditorHelpers(view: EditorView, actionId?: string) {
     },
 
     setCursorPosition: (pos: number) => {
+      if (intersectsExcludedRange(pos, pos)) return
       view.dispatch({
         selection: { anchor: pos }
       })
@@ -313,8 +378,8 @@ export function getEditorHelpers(view: EditorView, actionId?: string) {
     // Line operations
     getCurrentLine: () => {
       const pos = view.state.selection.main.head
-      const line = view.state.doc.lineAt(pos)
-      return line.text
+      const currentLineNumber = view.state.doc.lineAt(pos).number
+      return getFilteredText().split('\n')[currentLineNumber - 1] || ''
     },
 
     getLineCount: () => {
@@ -324,6 +389,7 @@ export function getEditorHelpers(view: EditorView, actionId?: string) {
     // Template insertion with variable processing
     insertTemplate: (templateContent: string) => {
       const selection = view.state.selection.main
+      if (intersectsExcludedRange(selection.from, selection.to)) return
       const selectedText = view.state.doc.sliceString(selection.from, selection.to)
       const pos = view.state.selection.main.head
 

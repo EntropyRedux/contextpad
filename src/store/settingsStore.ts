@@ -17,7 +17,7 @@ export interface CustomModel {
   maxContext: number
 }
 
-interface TokenSettings {
+export interface TokenSettings {
   method: TokenMethod
   selectedModel: string
   enableOnlineCalculation: boolean
