@@ -34,23 +34,17 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm install
 
-      - name: Build Tauri App
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: v1.10.0
-          releaseName: 'ContextPad v1.10.0'
-          releaseBody: 'Automated Linux release build.'
-          releaseDraft: false
-          prerelease: false
+      - name: Build Tauri Package
+        run: npx tauri build
 
-      - name: Upload Binary Artifact
+      - name: Upload Linux .deb Package Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: contextpad-linux-amd64
-          path: |
-            src-tauri/target/release/contextpad
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/appimage/*.AppImage
-          if-no-files-found: warn
+          name: ContextPad_1.10.0_amd64
+          path: src-tauri/target/release/bundle/deb/*.deb
+
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v1.10.0-linux-build" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v1.10.0 Linux Release" --notes "Automated Linux .deb installer package." --clobber || true
