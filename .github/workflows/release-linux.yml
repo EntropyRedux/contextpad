@@ -36,8 +36,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
-          releaseName: 'ContextPad v__VERSION__'
+          tagName: v1.10.0
+          releaseName: 'ContextPad v1.10.0'
           releaseBody: 'Automated Linux release build.'
           releaseDraft: false
           prerelease: false
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contextpad-linux-amd64
+          path: |
+            src-tauri/target/release/contextpad
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
+          if-no-files-found: warn
