@@ -1,7 +1,6 @@
 import { Suspense, lazy, useState } from 'react'
 import { useTabStore } from '../../store/tabStore'
 import { useShallow } from 'zustand/react/shallow'
-import { useNotificationStore } from '../../store/notificationStore'
 import { THEMES } from '../../themes/themeRegistry'
 import { Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
 import { useSettingsStore } from '../../store/settingsStore'
@@ -56,7 +55,6 @@ export function SettingsPanel() {
       setViewSettings: state.setViewSettings
     }))
   )
-  const addNotification = useNotificationStore(state => state.addNotification)
   const { appTheme, accentColor, accentOverridesHeadings, applyEditorFontAppWide } = useSettingsStore(state => state.appearance)
   const { setAppTheme, setAccentColor, setAccentOverridesHeadings, setApplyEditorFontAppWide } = useSettingsStore()
   const [newWord, setNewWord] = useState('')

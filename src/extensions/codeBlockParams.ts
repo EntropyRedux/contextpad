@@ -116,7 +116,7 @@ function getParamCompletions(): Completion[] {
       type: 'constant',
       detail: 'Action ID',
       info: `Exclude action: ${action.name}`,
-      apply: (view, completion, from, to) => {
+      apply: (view, _completion, from, to) => {
         // If we are inside quotes, just insert the ID part? 
         // Or assume user typed "action:"? 
         // Simple insert for now.
@@ -142,7 +142,7 @@ function getParamCompletions(): Completion[] {
         type: 'property',
         detail: 'string',
         info: info.description,
-        apply: (view, completion, from, to) => {
+        apply: (view, _completion, from, to) => {
           const insert = `${key}=""`
           view.dispatch({
             changes: { from, to, insert },

@@ -4,12 +4,11 @@ import { useActionStore } from '../../store/actionStore'
 import { useTabStore } from '../../store/tabStore'
 import { useTemplateStore } from '../../store/templateStore'
 import {
-  FileText, Terminal, Play, Eye, EyeOff, Calculator,
-  ChevronDown, ChevronRight, CheckSquare, Square, Star,
-  ArrowUp, ArrowDown, X, Zap, Power, Edit2, MousePointerClick, Plus
+  Terminal, Play, Eye, EyeOff, Calculator,
+  Star, Zap, Power, Edit2, MousePointerClick, Plus
 } from 'lucide-react'
 import { executeAction } from '../../utils/actionExecutor'
-import { getFormulaFunctionsByCategory, previewFormula } from '../../services/formulaParser'
+import { getFormulaFunctionsByCategory } from '../../services/formulaParser'
 import { useNotificationStore } from '../../store/notificationStore'
 import { ManagerToolbar } from './shared/ManagerToolbar'
 import { ManagerList } from './shared/ManagerList'
@@ -60,8 +59,8 @@ export function ActionManager() {
   // Formula builder state
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedFunction, setSelectedFunction] = useState<string>('')
-  const [formulaInput, setFormulaInput] = useState<'selection' | 'custom'>('selection')
-  const [customInput, setCustomInput] = useState('')
+  const [formulaInput] = useState<'selection' | 'custom'>('selection')
+  const [customInput] = useState('')
 
   useEffect(() => {
     if (!bulkMode) setSelectedItems(new Set())
@@ -85,12 +84,6 @@ export function ActionManager() {
     if (!selectedFunction) return ''
     return formulaInput === 'selection' ? `${selectedFunction}()` : `${selectedFunction}(${customInput})`
   }
-
-  const formulaPreview = useMemo(() => {
-    const formula = formData.codeType === 'formula' ? formData.code : ''
-    if (!formula) return ''
-    return previewFormula(formula, 'sample text')
-  }, [formData.code, formData.codeType])
 
   const applyFormulaFromBuilder = () => {
     const formula = buildFormula()
@@ -123,8 +116,7 @@ export function ActionManager() {
     const template = templates.find(t => t.id === templateId)
     if (template) {
       const escapedContent = template.content.replace(/`/g, '\`').replace(/\$/g, '\\$')
-      const code = `// Insert template: ${template.name}\nhelpers.insertTemplate(\`${escapedContent}\`)
-`
+      const code = `// Insert template: ${template.name}\nhelpers.insertTemplate(\`${escapedContent}\`)\n`
       setFormData({
         ...formData,
         name: formData.name || `Insert ${template.name}`,
@@ -132,18 +124,6 @@ export function ActionManager() {
         code: code,
         category: template.category
       })
-    }
-  }
-
-  const handleCommandSelect = (commandType: string) => {
-    let code = ''
-    // ... command logic (simplified)
-    if (commandType === 'uppercase') code = `helpers.replaceSelection(helpers.getSelection().toUpperCase())`
-    if (commandType === 'lowercase') code = `helpers.replaceSelection(helpers.getSelection().toLowerCase())`
-    if (commandType === 'insert-date') code = `helpers.insertAtCursor(new Date().toISOString().split('T')[0])`
-
-    if (code) {
-      setFormData({ ...formData, code })
     }
   }
 

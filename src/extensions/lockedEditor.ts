@@ -15,8 +15,8 @@
  * ```
  */
 
-import { EditorState, StateField, RangeSet, RangeSetBuilder, RangeValue, Transaction, Annotation } from '@codemirror/state'
-import { EditorView, Decoration, DecorationSet, ViewUpdate } from '@codemirror/view'
+import { EditorState, StateField, RangeSet, RangeSetBuilder, RangeValue, Annotation } from '@codemirror/state'
+import { EditorView, Decoration } from '@codemirror/view'
 import { syntaxTree } from '@codemirror/language'
 import { extractCodeBlockInfo, getParamAsString } from '../utils/codeBlockParams'
 
@@ -142,7 +142,7 @@ function buildLockedRanges(state: EditorState): { locked: RangeSet<LockedRangeVa
 // State Fields
 // =============================================================================
 
-const lockedRangesField = StateField.define<{ locked: RangeSet<LockedRangeValue>, allowed: RangeSet<AllowedRangeValue> }>({
+export const lockedRangesField = StateField.define<{ locked: RangeSet<LockedRangeValue>, allowed: RangeSet<AllowedRangeValue> }>({
   create(state) {
     return buildLockedRanges(state)
   },

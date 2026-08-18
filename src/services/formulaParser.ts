@@ -445,10 +445,6 @@ class Parser {
     return false
   }
 
-  private isAlphaNum(char: string): boolean {
-    return /^[a-zA-Z0-9_]$/.test(char)
-  }
-
   private isSpecialIdentifierChar(char: string): boolean {
     // Allow certain chars in unquoted strings/identifiers to act like the original regex logic
     // Ex: URLs, numbers, brackets, etc. unless they interfere with parsing

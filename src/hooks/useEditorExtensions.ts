@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { EditorView, lineNumbers, highlightActiveLineGutter, highlightActiveLine, keymap, Decoration, DecorationSet, ViewPlugin, ViewUpdate } from '@codemirror/view'
-import { EditorState, RangeSetBuilder, Compartment, Extension } from '@codemirror/state'
+import { RangeSetBuilder, Compartment, Extension } from '@codemirror/state'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { bracketMatching, foldGutter, indentOnInput } from '@codemirror/language'
 import { search, highlightSelectionMatches } from '@codemirror/search'

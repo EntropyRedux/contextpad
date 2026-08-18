@@ -37,15 +37,6 @@ export class CustomEstimator implements IEstimator {
           // If the user picked an online model to inherit from, we can't easily proxy that here without access to the service/API keys.
           // So we restrict 'inherit' to using LocalEstimator (tiktoken) logic for now.
           
-          // We can construct a temporary model def for the local estimator
-          const baseEncoding = 'o200k_base' // Default fallback
-          const tempModel: ModelDefinition = {
-             ...model,
-             method: 'local',
-             encoding: model.baseModelId === 'gpt-4o' ? 'o200k_base' : 'cl100k_base' 
-             // Logic to resolve encoding from baseModelId would be better if exposed
-          }
-          
           // Better: Check if the base model exists in registry
           const baseModel = getModelById(model.baseModelId)
           if (baseModel && baseModel.method === 'local') {

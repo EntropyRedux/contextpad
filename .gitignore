@@ -1,35 +1,12 @@
-# Dependencies
-node_modules/
-package-lock.json
-
-# Tauri build outputs
-src-tauri/target/
-
-# Build outputs
-dist/
-build/
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
+node_modules
+dist
+dist-linux
+src-tauri/target
 *.log
 npm-debug.log*
-
-# Environment
 .env
 .env.local
-.env.*
-!.env.example
-
-# Local docs/context (do not push)
-/dev-docs/
-/CONTEXT.md
-
-# Local exports / workspace snapshots (do not push)
-/templates&actions-library/actions-*.json
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -6,7 +6,7 @@ import { useNotificationStore } from '../../store/notificationStore'
 import { PINNED_TAB_ICONS, PinnedTabIcon, DEFAULT_PINNED_TAB_ICON } from '../../constants/pinnedTabIcons'
 import * as Icons from 'lucide-react'
 import { 
-  FileText, Play, Edit2, Plus, Eye, EyeOff, Bookmark, Workflow as WorkflowIcon
+  FileText, Play, Edit2, Eye, EyeOff, Bookmark, Workflow as WorkflowIcon
 } from 'lucide-react'
 import { ManagerToolbar } from './shared/ManagerToolbar'
 import { ManagerList } from './shared/ManagerList'

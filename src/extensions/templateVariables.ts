@@ -1,4 +1,4 @@
-import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate, keymap, WidgetType } from '@codemirror/view'
+import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate, keymap } from '@codemirror/view'
 import { RangeSetBuilder } from '@codemirror/state'
 
 // Highlight {{VARIABLE}} with underline + background

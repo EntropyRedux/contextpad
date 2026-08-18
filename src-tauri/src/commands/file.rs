@@ -3,15 +3,33 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
+/// Canonicalize and validate a path.
+/// Returns an error if the path contains traversal sequences after resolution.
+fn validate_path(path: &str) -> Result<PathBuf, String> {
+    let path_buf = PathBuf::from(path);
+    let path_str = path_buf.to_string_lossy();
+
+    if path_str.contains("..") {
+        if let Ok(canonical) = std::fs::canonicalize(&path_buf) {
+            return Ok(canonical);
+        }
+        return Err("Path traversal detected".to_string());
+    }
+
+    Ok(path_buf)
+}
+
 #[tauri::command]
 pub async fn read_file(path: String) -> Result<String, String> {
-    fs::read_to_string(&path)
+    let safe_path = validate_path(&path)?;
+    fs::read_to_string(&safe_path)
         .map_err(|e| format!("Failed to read file: {}", e))
 }
 
 #[tauri::command]
 pub async fn write_file(path: String, content: String) -> Result<(), String> {
-    fs::write(&path, content)
+    let safe_path = validate_path(&path)?;
+    fs::write(&safe_path, content)
         .map_err(|e| format!("Failed to write file: {}", e))
 }
 

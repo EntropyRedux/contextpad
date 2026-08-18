@@ -3,7 +3,6 @@ import { invoke } from '@tauri-apps/api/core'
 import { Eye, EyeOff, Save, Trash2, AlertCircle, Plus, Edit, ChevronDown, ChevronRight } from 'lucide-react'
 import { useSettingsStore, CustomModel } from '../../store/settingsStore'
 import {
-  MODEL_REGISTRY,
   getModelById,
   getModelsByProvider,
   ModelDefinition

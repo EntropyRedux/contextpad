@@ -126,8 +126,6 @@ export class CodeLintService {
 
   private lintHTML(code: string, offset: number): Diagnostic[] {
     const diagnostics: Diagnostic[] = []
-    // Basic unclosed tag check (simple stack)
-    const tags = code.match(/<\/?([a-z1-6]+)/gi) || []
     const stack: string[] = []
     
     // This is a very rough regex check

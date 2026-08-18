@@ -116,7 +116,7 @@ export class AutocompleteService {
 
   private getDocumentWordSuggestions(
     config: AutocompleteConfig,
-    indexingScope: 'performance' | 'thorough',
+    _indexingScope: 'performance' | 'thorough',
     context: CompletionContext,
     term: string
   ): Completion[] {

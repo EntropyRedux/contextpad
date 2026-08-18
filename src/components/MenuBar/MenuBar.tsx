@@ -29,16 +29,14 @@ export function MenuBar() {
   const menuRef = useRef<HTMLDivElement>(null)
   const { newFile, openFile, saveFile, saveFileAs, openRecentFile, openFolder } = useFileOperations()
   const { undo, redo, cut, copy, paste, lockAll, unlockAll, toggleLock } = useEditorCommands()
-  const { toggleStatusBar, toggleLineNumbers, toggleBreadcrumb, toggleActivityBar, zoomIn, zoomOut, resetZoom, toggleBracketMatching, toggleFoldGutter, toggleAutoIndent, toggleCodeBlockMarkers, toggleLivePreview } = useViewCommands()
-  const { recentFiles, clearRecentFiles, toggleRightSidebar, toggleLeftSidebar, setSidebarView, getActiveTab, showRightSidebar, viewSettings } = useTabStore(
+  const { toggleStatusBar, toggleLineNumbers, toggleBreadcrumb, toggleActivityBar, zoomIn, zoomOut, resetZoom, toggleCodeBlockMarkers, toggleLivePreview } = useViewCommands()
+  const { recentFiles, clearRecentFiles, toggleLeftSidebar, setSidebarView, getActiveTab, viewSettings } = useTabStore(
     useShallow(state => ({
       recentFiles: state.recentFiles,
       clearRecentFiles: state.clearRecentFiles,
-      toggleRightSidebar: state.toggleRightSidebar,
       toggleLeftSidebar: state.toggleLeftSidebar,
       setSidebarView: state.setSidebarView,
       getActiveTab: state.getActiveTab,
-      showRightSidebar: state.showRightSidebar,
       viewSettings: state.viewSettings
     }))
   )

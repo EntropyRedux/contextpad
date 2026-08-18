@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { TokenMethod } from '../types/tokenTypes'
-import { getDefaultModelId, getModelById, isValidModelId } from '../services/tokenEstimator/models'
+import { getDefaultModelId, getModelById } from '../services/tokenEstimator/models'
 
 export interface CustomModel {
   id: string

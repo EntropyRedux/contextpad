@@ -21,14 +21,12 @@ import { RangeSetBuilder } from '@codemirror/state'
 import {
   executeFormula,
   validateFormula,
-  previewFormula,
   setEditorContext,
   type EditorContext
 } from '../services/formulaParser'
 import { useNotificationStore } from '../store/notificationStore'
+import { lockedRangesField } from './lockedEditor'
 
-// Regex to match inline formulas: {=FORMULA()}
-const FORMULA_REGEX = /\{=([^}]+)\}/g
 
 /**
  * Widget that renders a small run button next to formulas
@@ -72,6 +70,24 @@ function executeFormulaAtPosition(
   formula: string
 ) {
   const addNotification = useNotificationStore.getState().addNotification
+
+  // Check if formula is inside a locked block
+  const lockedRanges = view.state.field(lockedRangesField, false)
+  if (lockedRanges) {
+    let isLocked = false
+    lockedRanges.locked.between(from, to, () => {
+      isLocked = true
+      return false
+    })
+    if (isLocked) {
+      addNotification({
+        type: 'warning',
+        message: 'Cannot execute formula inside a locked block',
+        details: formula
+      })
+      return
+    }
+  }
 
   // Get current selection (if any) for formulas that use it
   const selection = view.state.sliceDoc(
@@ -297,12 +313,24 @@ export function executeAllFormulas(view: EditorView): { executed: number; errors
     })
   }
 
-  if (matches.length === 0) {
+  const lockedRanges = view.state.field(lockedRangesField, false)
+  const safeMatches = lockedRanges
+    ? matches.filter(m => {
+        let isLocked = false
+        lockedRanges.locked.between(m.from, m.to, () => {
+          isLocked = true
+          return false
+        })
+        return !isLocked
+      })
+    : matches
+
+  if (safeMatches.length === 0) {
     setEditorContext(null)
     addNotification({
       type: 'info',
-      message: 'No formulas found',
-      details: 'No {=FORMULA()} syntax found in document'
+      message: 'No formulas executable',
+      details: 'No unlocked {=FORMULA()} syntax found in document'
     })
     return { executed: 0, errors: 0 }
   }

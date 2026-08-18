@@ -101,7 +101,7 @@ const Row = memo(function Row({
 export const VirtualizedOutline = memo(function VirtualizedOutline({
   items,
   onItemClick,
-  onToggleCollapse
+  onToggleCollapse: _onToggleCollapse
 }: VirtualizedOutlineProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const containerRef = useRef<HTMLDivElement>(null)

@@ -22,11 +22,11 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: asset: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://api.anthropic.com ws://127.0.0.1:*; frame-src 'self' blob:"
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["deb"]
+    "targets": ["nsis", "portable", "deb"]
   }
 }

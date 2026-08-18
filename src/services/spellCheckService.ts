@@ -50,7 +50,7 @@ export class SpellCheckService {
    * Create browser native spellcheck extension
    * Uses OS dictionary - zero performance overhead
    */
-  createBrowserSpellCheckExtension(): Extension {
+  createBrowserSpellCheckExtension(_config?: SpellCheckConfig): Extension {
     return EditorView.contentAttributes.of({ spellcheck: 'true' })
   }
 
@@ -280,7 +280,7 @@ export class SpellCheckService {
     return false
   }
 
-  private getSuggestions(word: string, config: SpellCheckConfig): string[] {
+  private getSuggestions(word: string, _config: SpellCheckConfig): string[] {
     const lower = word.toLowerCase()
     const suggestions: Array<{ word: string, dist: number }> = []
 

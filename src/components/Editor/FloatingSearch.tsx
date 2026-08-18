@@ -121,9 +121,7 @@ export const FloatingSearch: React.FC<FloatingSearchProps> = ({ view, onClose: o
         if (matches && matches.length > 0) {
           const cursorPos = view.state.selection.main.from
           let matchIndex = 0
-          let pos = 0
           let match
-          const searchRegex = new RegExp(regex.source, regex.flags.replace('g', ''))
           const globalRegex = new RegExp(regex.source, caseSensitive ? 'g' : 'gi')
 
           while ((match = globalRegex.exec(text)) !== null) {

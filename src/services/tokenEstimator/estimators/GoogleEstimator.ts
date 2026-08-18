@@ -51,13 +51,14 @@ export class GoogleEstimator implements IEstimator {
   async estimate(content: string, model: ModelDefinition): Promise<EstimatorResult> {
     const apiKey = await this.getApiKey()
 
-    const url = `${GEMINI_API_BASE}/${model.id}:countTokens?key=${apiKey}`
+    const url = `${GEMINI_API_BASE}/${model.id}:countTokens`
 
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
         },
         body: JSON.stringify({
           contents: [

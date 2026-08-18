@@ -18,7 +18,7 @@ import { anthropicEstimator } from './estimators/AnthropicEstimator'
 import { googleEstimator } from './estimators/GoogleEstimator'
 import { customEstimator } from './estimators/CustomEstimator'
 import { EstimatorError } from './estimators/types'
-import type { IEstimator, EstimatorResult } from './estimators/types'
+import type { IEstimator } from './estimators/types'
 import { useSettingsStore } from '../../store/settingsStore'
 
 // ============================================

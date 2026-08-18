@@ -20,7 +20,6 @@ export function TemplateManager() {
     addTemplate,
     updateTemplate,
     renameTemplateId,
-    deleteTemplate,
     deleteTemplatesBulk,
     toggleTemplatesVisibilityBulk,
     exportTemplates,

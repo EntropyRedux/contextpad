@@ -33,6 +33,7 @@ export function useFileOperations() {
         content,
         filePath,
         folderPath,
+        language,
         isDirty: false,
       })
 

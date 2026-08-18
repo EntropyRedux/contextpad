@@ -4,7 +4,6 @@
  */
 
 import {
-  autocompletion,
   CompletionContext,
   CompletionResult,
   Completion,

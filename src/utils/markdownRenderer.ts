@@ -55,9 +55,9 @@ marked.use({
         }
       }
     },
-    renderer(token: { type: string, raw: string, id: string }) {
-      return `<button class="cm-action-button" title="Action: \${token.id}" data-action-id="\${token.id}">
-        \${token.id}
+    renderer(token: { id: string }) {
+      return `<button class="cm-action-button" title="Action: ${token.id}" data-action-id="${token.id}">
+        ${token.id}
       </button>`
     }
   } as any],

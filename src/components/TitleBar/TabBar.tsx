@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useTabStore, Tab } from '../../store/tabStore'
 import { useShallow } from 'zustand/react/shallow'
 import { useWindowDrag } from '../../hooks/useWindowDrag'
-import { Plus, X, ChevronLeft, ChevronRight, MousePointer2 } from 'lucide-react'
+import { Plus, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ContextMenu, ContextMenuItem } from '../shared/ContextMenu'
 import styles from './TabBar.module.css'
 
@@ -28,7 +28,6 @@ export function TabBar() {
   // Drag and Drop state
   const [draggedTabId, setDraggedTabId] = useState<string | null>(null)
   const [dragOverTabId, setDragOverTabId] = useState<string | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
   const dragStartX = useRef(0)
   const isDraggingRef = useRef(false)
 
