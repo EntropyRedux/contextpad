@@ -47,4 +47,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "v1.10.0-linux-build" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v1.10.0 Linux Release" --notes "Automated Linux .deb installer package." --clobber || true
+          RELEASE_TAG="v1.10.0-linux-$(date +'%Y%m%d-%H%M%S')"
+          gh release create "$RELEASE_TAG" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v1.10.0 Linux Release ($RELEASE_TAG)" --notes "Automated Linux .deb installer package release." || true
