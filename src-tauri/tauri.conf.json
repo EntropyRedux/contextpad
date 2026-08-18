@@ -27,6 +27,6 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "portable", "deb"]
+    "targets": ["nsis", "deb"]
   }
 }

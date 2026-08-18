@@ -35,10 +35,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist-windows
-          find src-tauri/target/release/bundle/nsis -name "*.exe" -exec cp {} dist-windows/ \; 2>/dev/null || true
-          find src-tauri/target/release/bundle/portable -name "*.exe" -exec cp {} dist-windows/ \; 2>/dev/null || true
-          find src-tauri/target/release/bundle/msi -name "*.msi" -exec cp {} dist-windows/ \; 2>/dev/null || true
-          find src-tauri/target/release -maxdepth 1 -name "*.exe" -exec cp {} dist-windows/ \; 2>/dev/null || true
+          find src-tauri/target/release/bundle/nsis -name "*.exe" -exec cp {} dist-windows/ContextPad_1.10.0_x64_Setup.exe \; 2>/dev/null || true
+          if [ -f src-tauri/target/release/contextpad.exe ]; then
+            cp src-tauri/target/release/contextpad.exe dist-windows/ContextPad_1.10.0_x64_Portable.exe
+          fi
           ls -la dist-windows
 
       - name: Upload Windows Executables Artifact
