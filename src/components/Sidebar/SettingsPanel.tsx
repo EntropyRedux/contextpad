@@ -252,7 +252,7 @@ export function SettingsPanel() {
           <select
             className={styles.select}
             value={viewSettings.indexingScope}
-            onChange={(e) => setViewSettings({ indexingScope: e.target.value as any })}
+            onChange={(e) => setViewSettings({ indexingScope: e.target.value as 'performance' | 'thorough' })}
           >
             <option value="performance">Fast (50k chars)</option>
             <option value="thorough">Full Document</option>
@@ -511,7 +511,7 @@ export function SettingsPanel() {
           <select
             className={styles.select}
             value={viewSettings.previewTheme}
-            onChange={(e) => setViewSettings({ previewTheme: e.target.value as any })}
+            onChange={(e) => setViewSettings({ previewTheme: e.target.value as 'match' | 'light' | 'dark' })}
           >
             <option value="match">Match Editor</option>
             <option value="dark">Dark</option>
@@ -591,7 +591,7 @@ export function SettingsPanel() {
           <select
             className={styles.select}
             value={viewSettings.parserMode || 'auto'}
-            onChange={(e) => setViewSettings({ parserMode: e.target.value as any })}
+            onChange={(e) => setViewSettings({ parserMode: e.target.value as 'auto' | 'ast' | 'stream' | 'plain' })}
           >
             <option value="auto">Auto (Smart)</option>
             <option value="ast">Force Highlighting</option>

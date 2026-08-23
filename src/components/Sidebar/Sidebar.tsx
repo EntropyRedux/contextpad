@@ -15,7 +15,7 @@ type SidebarView = 'settings' | 'templates' | 'actions' | 'workflows' | null
 
 // Dynamic icon component for pinned tabs
 function DynamicIcon({ name, size = 20 }: { name: string; size?: number }) {
-  const IconComponent = (Icons as any)[name]
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[name]
   if (!IconComponent) return <FileText size={size} />
   return <IconComponent size={size} />
 }

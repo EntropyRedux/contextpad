@@ -32,6 +32,8 @@ import { lockedRangesField } from './lockedEditor'
  * Widget that renders a small run button next to formulas
  */
 class FormulaRunWidget extends WidgetType {
+  private clickHandler: ((e: MouseEvent) => void) | null = null
+
   constructor(
     readonly formula: string,
     readonly from: number,
@@ -46,13 +48,21 @@ class FormulaRunWidget extends WidgetType {
     button.textContent = '▶'
     button.title = 'Execute formula (Ctrl+Enter)'
 
-    button.addEventListener('click', (e) => {
+    this.clickHandler = (e: MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
       executeFormulaAtPosition(view, this.from, this.to, this.formula)
-    })
+    }
 
+    button.addEventListener('click', this.clickHandler)
     return button
+  }
+
+  destroy(dom: HTMLElement) {
+    if (this.clickHandler) {
+      dom.removeEventListener('click', this.clickHandler)
+      this.clickHandler = null
+    }
   }
 
   ignoreEvent() {

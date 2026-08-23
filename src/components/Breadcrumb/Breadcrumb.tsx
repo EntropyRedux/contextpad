@@ -69,13 +69,18 @@ export function Breadcrumb() {
   if (!rootFolder && activeTab.filePath) {
     const parts = activeTab.filePath.split(/[\\/]/)
     parts.pop()
-    rootFolder = parts.join('\\')
+    const isWin = activeTab.filePath.includes('\\')
+    rootFolder = parts.join(isWin ? '\\' : '/')
   }
   if (!rootFolder) rootFolder = browsePath || ''
 
   // Build segments relative to root
-  const relativePath = browsePath.replace(rootFolder, '').replace(/^[\\/]+/, '')
-  const segments = relativePath ? relativePath.split(/[\\/]/).filter(Boolean) : []
+  const normBrowse = browsePath.replace(/\\/g, '/')
+  const normRoot = rootFolder.replace(/\\/g, '/')
+  const relativePath = normBrowse.startsWith(normRoot)
+    ? normBrowse.slice(normRoot.length).replace(/^\/+/, '')
+    : normBrowse.replace(/^[\\/]+/, '')
+  const segments = relativePath ? relativePath.split('/').filter(Boolean) : []
   const rootFolderName = rootFolder.split(/[\\/]/).filter(Boolean).pop() || 'Workspace'
 
   // --- Handlers ---
@@ -116,7 +121,8 @@ export function Breadcrumb() {
     if (currentDropdownPath === baseSegmentPath) return
     const parts = currentDropdownPath.split(/[\\/]/)
     parts.pop()
-    handleNavigateDropdown(parts.join('\\'))
+    const isWin = currentDropdownPath.includes('\\')
+    handleNavigateDropdown(parts.join(isWin ? '\\' : '/'))
   }
 
   const handleSelectFolder = (path: string) => {
@@ -153,15 +159,17 @@ export function Breadcrumb() {
   const handleRenameSubmit = async () => {
     if (!activeTab || !renameValue.trim() || !activeTab.filePath) return
     try {
-      const dir = activeTab.filePath.split(/[\\/]/)
-      dir.pop()
-      const newPath = `${dir.join('\\')}\\${renameValue}`
+      const parts = activeTab.filePath.split(/[\\/]/)
+      parts.pop()
+      const isWin = activeTab.filePath.includes('\\')
+      const sep = isWin ? '\\' : '/'
+      const newPath = `${parts.join(sep)}${sep}${renameValue.trim()}`
       await invoke('rename_file', { oldPath: activeTab.filePath, newPath })
-      updateTab(activeTab.id, { title: renameValue, filePath: newPath })
+      updateTab(activeTab.id, { title: renameValue.trim(), filePath: newPath })
       addNotification({
         type: 'success',
         message: 'File renamed',
-        details: `Renamed to: ${renameValue}`
+        details: `Renamed to: ${renameValue.trim()}`
       })
     } catch (err) {
       addNotification({
@@ -223,7 +231,9 @@ export function Breadcrumb() {
 
         {/* Sub-path Segments */}
         {segments.map((name, i) => {
-          const path = rootFolder + '\\' + segments.slice(0, i + 1).join('\\')
+          const isWin = rootFolder.includes('\\')
+          const sep = isWin ? '\\' : '/'
+          const path = rootFolder + sep + segments.slice(0, i + 1).join(sep)
           const isLast = i === segments.length - 1
           const isActualFile = isLast && activeTab.filePath === browsePath
 

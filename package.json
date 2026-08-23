@@ -1,6 +1,6 @@
 {
   "name": "contextpad",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "author": "entropy_redux",
   "license": "GPL-3.0",
   "type": "module",
@@ -12,7 +12,10 @@
     "tauri:preflight": "node scripts/tauri-preflight.mjs",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "tauri:wrapup": "npm run tauri:preflight && npm run tauri:build"
+    "tauri:wrapup": "npm run tauri:preflight && npm run tauri:build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
@@ -50,16 +53,21 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.13.0",
-    "react-window": "^2.2.5",
+    "react-window": "^1.8.10",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.10.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/node": "^25.6.0",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
     "@types/react-window": "^1.8.8",
+    "jsdom": "^24.0.0",
     "typescript": "^5.5.4",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "vitest": "^1.0.0"
   }
 }

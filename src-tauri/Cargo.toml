@@ -1,6 +1,6 @@
 [package]
 name = "contextpad"
-version = "1.10.0"
+version = "1.11.0"
 authors = ["entropy_redux"]
 edition = "2021"
 

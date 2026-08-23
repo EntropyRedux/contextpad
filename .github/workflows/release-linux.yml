@@ -40,12 +40,12 @@ jobs:
       - name: Upload Linux .deb Package Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ContextPad_1.10.0_amd64
+          name: ContextPad_1.11.0_amd64
           path: src-tauri/target/release/bundle/deb/*.deb
 
       - name: Publish GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_TAG="v1.10.0-linux-$(date +'%Y%m%d-%H%M%S')"
-          gh release create "$RELEASE_TAG" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v1.10.0 Linux Release ($RELEASE_TAG)" --notes "Automated Linux .deb installer package release." || true
+          RELEASE_TAG="v1.11.0-linux-$(date +'%Y%m%d-%H%M%S')"
+          gh release create "$RELEASE_TAG" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v1.11.0 Linux Release ($RELEASE_TAG)" --notes "Automated Linux .deb installer package release." || true

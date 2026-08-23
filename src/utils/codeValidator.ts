@@ -35,18 +35,41 @@ const DANGEROUS_PATTERNS = [
   /Proxy\s*\(/i,
 ]
 
-// Dynamic access patterns that bypass simple word matching
-const DYNAMIC_ACCESS_PATTERNS = [
-  /\[\s*['"`].*['"`]\s*\]/,           // bracket notation with any string
-  /\[\s*[^'"`\]\s].*\+.*\]/,          // bracket notation with concatenation
+// Dynamic access patterns that attempt to evade global variable restrictions
+// Relaxed to allow safe bracket notation while blocking dangerous patterns
+const DANGEROUS_DYNAMIC_ACCESS_PATTERNS = [
+  // Only block dynamic access on dangerous global objects
+  /(?:window|globalThis|document|global|root|top|parent|self)\s*\[.*[^"'0-9_\s]\]/i,
+  // Still block prototype manipulation
+  /(?:__proto__|prototype|constructor)\s*\[/i,
+  // Still block string manipulation that could be used for code obfuscation
   /String\.fromCharCode/i,
   /atob\s*\(/i,
   /btoa\s*\(/i,
-  /decodeURI/i,
+  // Still block hex/unicode escape sequences (obfuscation)
   /\\x[0-9a-fA-F]{2}/,
   /\\u[0-9a-fA-F]{4}/,
   /\\u\{[0-9a-fA-F]+\}/,
-  /`[^`]*\$\{/,                       // template literals with expressions
+]
+
+// Template literal validation - allow safe literals but check for dangerous content
+const TEMPLATE_LITERAL_DANGEROUS_PATTERNS = [
+  /\beval\s*\(/i,
+  /\bFunction\s*\(/i,
+  /\bprocess\s*\./i,
+  /\brequire\s*\(/i,
+  /\bimport\s*\(/i,
+  /child_process/i,
+  /\.invoke\s*\(/i,
+  /window\s*[\[.]/i,
+  /document\s*[\[.]/i,
+  /localStorage/i,
+  /sessionStorage/i,
+  /indexedDB/i,
+  /globalThis/i,
+  /__proto__/,
+  /\.constructor\b/,
+  /\.prototype\b/,
 ]
 
 // Warning patterns (allowed but risky)
@@ -58,10 +81,36 @@ const WARNING_PATTERNS = [
 ]
 
 /**
+ * Validate template literals for dangerous content
+ * Allows safe template literals while blocking dangerous patterns
+ */
+function validateTemplateLiterals(code: string): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  // Extract template literals
+  const templateLiteralRegex = /`([^`]*)`/g
+  let match
+  
+  while ((match = templateLiteralRegex.exec(code)) !== null) {
+    const content = match[1]
+    
+    // Check for dangerous patterns in template literal content
+    for (const pattern of TEMPLATE_LITERAL_DANGEROUS_PATTERNS) {
+      if (pattern.test(content)) {
+        errors.push(`Template literal contains dangerous pattern: ${pattern.source}`)
+      }
+    }
+  }
+  
+  return { valid: errors.length === 0, errors }
+}
+
+/**
  * Validate action code for security.
  * Layer 1: Regex pre-filter for known dangerous patterns.
- * Layer 2: Syntax validation via Function constructor.
- * Layer 3: Dynamic access pattern detection.
+ * Layer 2: Dynamic access bypass detection.
+ * Layer 3: Template literal validation (allows safe literals, blocks dangerous content).
+ * Layer 4: Syntax validation via Function constructor.
  */
 export function validateActionCode(code: string): ValidationResult {
   const errors: string[] = []
@@ -74,21 +123,27 @@ export function validateActionCode(code: string): ValidationResult {
     }
   }
 
-  // Layer 3: Dynamic access bypass detection
-  for (const pattern of DYNAMIC_ACCESS_PATTERNS) {
+  // Layer 2: Dynamic access bypass detection
+  for (const pattern of DANGEROUS_DYNAMIC_ACCESS_PATTERNS) {
     if (pattern.test(code)) {
       errors.push(`Potentially unsafe dynamic access: ${pattern.source}`)
     }
   }
 
-  // Layer 2: Warning patterns
+  // Layer 3: Template literal validation
+  const templateValidation = validateTemplateLiterals(code)
+  if (!templateValidation.valid) {
+    errors.push(...templateValidation.errors)
+  }
+
+  // Layer 4: Warning patterns
   for (const pattern of WARNING_PATTERNS) {
     if (pattern.test(code)) {
       warnings.push(`Potentially risky pattern: ${pattern.source} (may cause performance issues)`)
     }
   }
 
-  // Syntax validation
+  // Layer 5: Syntax validation
   try {
     new Function('helpers', 'console', 'navigator', code)
   } catch (err) {

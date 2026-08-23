@@ -292,31 +292,17 @@ const loadMetadataFromLocalStorage = () => {
         category: p.category || 'General'
       }))
 
-      // Path Fix-up: If the project was moved, update file paths in tabs
-      const currentDir = 'Repo/Active/ContextPad';
-      const oldDir = 'Repo/ContextPad';
-      
-      const tabs = (parsed.tabs || []).map((tab: any) => {
-        if (tab.filePath && tab.filePath.includes(oldDir) && !tab.filePath.includes(currentDir)) {
-          return { ...tab, filePath: tab.filePath.replace(oldDir, currentDir) };
-        }
-        if (tab.folderPath && tab.folderPath.includes(oldDir) && !tab.folderPath.includes(currentDir)) {
-          return { ...tab, folderPath: tab.folderPath.replace(oldDir, currentDir) };
-        }
-        return tab;
-      });
+      const tabs = parsed.tabs || []
 
       return {
         tabs,
         activeTabId: parsed.activeTabId || null,
         viewSettings: safeViewSettings,
-        recentFiles: (parsed.recentFiles || []).map((f: string) => 
-          (f.includes(oldDir) && !f.includes(currentDir)) ? f.replace(oldDir, currentDir) : f
-        ),
-        openFolderPath: (parsed.openFolderPath && parsed.openFolderPath.includes(oldDir) && !parsed.openFolderPath.includes(currentDir))
-          ? parsed.openFolderPath.replace(oldDir, currentDir)
-          : (parsed.openFolderPath || null),
-        pinnedTabs
+        recentFiles: parsed.recentFiles || [],
+        openFolderPath: parsed.openFolderPath || null,
+        pinnedTabs,
+        pinnedCategoryOrder: parsed.pinnedCategoryOrder || [],
+        pinnedCollapsedCategories: parsed.pinnedCollapsedCategories || []
       }
     }
   } catch (error) {
@@ -352,8 +338,8 @@ export const useTabStore = create<TabState>((set, get) => ({
   sidebarView: 'settings',
   isInitialized: false,
   pinnedTabs: persistedMetadata?.pinnedTabs || defaultPinnedTabs,
-  pinnedCategoryOrder: (persistedMetadata as any)?.pinnedCategoryOrder || [],
-  pinnedCollapsedCategories: (persistedMetadata as any)?.pinnedCollapsedCategories || [],
+  pinnedCategoryOrder: persistedMetadata?.pinnedCategoryOrder || [],
+  pinnedCollapsedCategories: persistedMetadata?.pinnedCollapsedCategories || [],
 
   // Initialize and load content from IndexedDB
   initializeFromStorage: async () => {

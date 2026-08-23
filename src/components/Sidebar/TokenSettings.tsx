@@ -225,7 +225,7 @@ export const TokenSettings: React.FC = () => {
             className={styles.select}
             value={tokenSettings.limitMode}
             onChange={(e) => useSettingsStore.getState().setTokenSettings({
-              limitMode: e.target.value as any
+              limitMode: e.target.value as 'model_max' | 'custom_token' | 'cost_budget'
             })}
           >
             <option value="model_max">Model Max</option>

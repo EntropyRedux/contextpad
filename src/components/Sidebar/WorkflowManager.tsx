@@ -16,7 +16,7 @@ import styles from './shared/SidebarManager.module.css'
 
 // Dynamic icon component
 function DynamicIcon({ name, size = 16 }: { name: string; size?: number }) {
-  const IconComponent = (Icons as any)[name]
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[name]
   if (!IconComponent) return <FileText size={size} />
   return <IconComponent size={size} />
 }

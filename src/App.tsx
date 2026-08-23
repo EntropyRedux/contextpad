@@ -77,8 +77,13 @@ export default function App() {
   // Initialize storage on mount
   useEffect(() => {
     const init = async () => {
-      await initializeFromStorage()
-      setIsReady(true)
+      try {
+        await initializeFromStorage()
+      } catch (err) {
+        console.error('Failed to initialize storage:', err)
+      } finally {
+        setIsReady(true)
+      }
     }
     init()
   }, [initializeFromStorage])

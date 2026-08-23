@@ -1,0 +1,162 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-03-14T06:45:57.347Z",
+  "actions": [
+    {
+      "id": "fd808f96-29f9-4a46-b97c-77844beb8c49",
+      "name": "UPPERCASE",
+      "description": "Converts the selected text to UPPERCASE. Requires a text selection.",
+      "type": "button",
+      "code": "FORMULA:UPPER()",
+      "category": "TEXT TRANSFORM",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771681262450,
+      "updatedAt": 1771711636469
+    },
+    {
+      "id": "9fdb9c47-5106-429a-961a-9c2d1f1b8acc",
+      "name": "lowercase",
+      "description": "Converts the selected text to lowercase. Requires a text selection.",
+      "type": "button",
+      "code": "FORMULA:LOWER()",
+      "category": "TEXT TRANSFORM",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771681262450,
+      "updatedAt": 1771711641460
+    },
+    {
+      "id": "89aa2e5c-bf7a-4513-8f39-f0612b3c8ed2",
+      "name": "Title Case",
+      "description": "Converts the selected text to Title Case. Requires a text selection.",
+      "type": "button",
+      "code": "FORMULA:TITLE()",
+      "category": "TEXT TRANSFORM",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771681262450,
+      "updatedAt": 1771711646217
+    },
+    {
+      "id": "f04f3b7b-354d-4142-b19b-bd6c97b0a07e",
+      "name": "snake_case",
+      "description": "Converts the selected text to snake_case. Requires a text selection.",
+      "type": "button",
+      "code": "FORMULA:SNAKE()",
+      "category": "TEXT TRANSFORM",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771681262450,
+      "updatedAt": 1771711650001
+    },
+    {
+      "id": "02e0e367-ac28-4a5a-ab5a-0f58b4441fa6",
+      "name": "camelCase",
+      "description": "Converts the selected text to camelCase. Requires a text selection.",
+      "type": "button",
+      "code": "FORMULA:CAMEL()",
+      "category": "TEXT TRANSFORM",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771681262450,
+      "updatedAt": 1771711653882
+    },
+    {
+      "id": "4f2c2705-3a43-4dc5-9911-acad45f683ef",
+      "name": " Clear YAML Blocks",
+      "description": "Scans the entire document and removes all YAML code blocks, including the ```yaml fences and their content.",
+      "type": "button",
+      "code": "const text = helpers.getAllText();\nconst lines = text.split('\\n');\nconst result = [];\nlet inYaml = false;\nfor (let i = 0; i < lines.length; i++) {\n  const t = lines[i].trim();\n  if (!inYaml && t.startsWith('```yaml')) { inYaml = true; continue; }\n  if (inYaml && t.startsWith('```')) { inYaml = false; continue; }\n  if (!inYaml) result.push(lines[i]);\n}\nhelpers.replaceAllText(result.join('\\n'));",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "6d682ee7-023d-4ca1-810c-90d9380b32c0",
+      "name": "Copy Next YAML Content",
+      "description": "Finds the first YAML block below the cursor and copies its full content to the clipboard (excludes fences).",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst startLine = textBeforeCursor.split('\\n').length;\nlet recording = false;\nconst content = [];\n\nfor (let i = startLine - 1; i < lines.length; i++) {\n  const line = lines[i];\n  if (!recording && line.trim().startsWith('```yaml')) {\n    recording = true;\n    continue;\n  }\n  if (recording) {\n    if (line.trim().startsWith('```')) break;\n    content.push(line);\n  }\n}\n\nif (content.length > 0) {\n  helpers.copyToClipboard(content.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "5adff2a9-18ee-4bcc-a45a-a6872cfba059",
+      "name": " Clear YAML Values",
+      "description": "Preserves the YAML structure (fences and keys) but deletes all values after the colons and list markers, across all YAML blocks.",
+      "type": "button",
+      "code": "const text = helpers.getAllText();\nconst lines = text.split('\\n');\nconst result = [];\nlet inYaml = false;\nfor (let i = 0; i < lines.length; i++) {\n  const line = lines[i];\n  const t = line.trim();\n  if (t.startsWith('```yaml')) { inYaml = true; result.push(line); continue; }\n  if (inYaml && t.startsWith('```')) { inYaml = false; result.push(line); continue; }\n  if (inYaml) {\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      result.push(line.substring(0, colonIndex + 1));\n      continue;\n    }\n    const dashIndex = line.indexOf('-');\n    if (dashIndex !== -1 && line.substring(dashIndex).trim().startsWith('- ')) {\n      result.push(line.substring(0, dashIndex + 1) + ' ');\n      continue;\n    }\n  }\n  result.push(line);\n}\nhelpers.replaceAllText(result.join('\\n'));",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "ca831e57-cc94-4676-ad36-02514f04d002",
+      "name": "Copy Next YAML Values",
+      "description": "Finds the first YAML block below the cursor and copies only the values (as-is, no bracket stripping).",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst startLine = textBeforeCursor.split('\\n').length;\nlet recording = false;\nconst values = [];\n\nfor (let i = startLine - 1; i < lines.length; i++) {\n  const line = lines[i];\n  const trimmed = line.trim();\n\n  if (!recording && trimmed.startsWith('```yaml')) {\n    recording = true;\n    continue;\n  }\n\n  if (recording) {\n    if (trimmed.startsWith('```')) break;\n    if (!trimmed || trimmed.startsWith('#')) continue;\n\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      const val = line.substring(colonIndex + 1).trim();\n      if (val) values.push(val);\n    }\n  }\n}\n\nif (values.length > 0) {\n  helpers.copyToClipboard(values.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "009d9b48-a8ce-4080-b78b-2d385a94bf4a",
+      "name": "Wrap in ''",
+      "description": "Executes SINGLEQUOTE formula to wrap selected text in single quotes.",
+      "type": "button",
+      "code": "FORMULA:SINGLEQUOTE()",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "a97f4e75-571c-4911-81de-5ec4ac2b9548",
+      "name": "Reset ALL",
+      "description": "Resets [[...]] values to {{key}} placeholders across ALL YAML blocks in the document.",
+      "type": "button",
+      "code": "const text = helpers.getAllText();\nconst lines = text.split('\\n');\nconst result = [];\nlet inYaml = false;\nfor (let i = 0; i < lines.length; i++) {\n  const line = lines[i];\n  const t = line.trim();\n  if (t.startsWith('```yaml')) { inYaml = true; result.push(line); continue; }\n  if (inYaml && t.startsWith('```')) { inYaml = false; result.push(line); continue; }\n  if (inYaml) {\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      const key = line.substring(0, colonIndex).trim();\n      const open = line.indexOf('[[', colonIndex);\n      const close = line.indexOf(']]', open);\n      if (open !== -1 && close !== -1) {\n        result.push(line.substring(0, open + 2) + '{{' + key + '}}' + line.substring(close));\n        continue;\n      }\n    }\n  }\n  result.push(line);\n}\nhelpers.replaceAllText(result.join('\\n'));",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "85b2754a-3c3c-4040-9e99-50272b863c24",
+      "name": "CLEAR",
+      "description": "Resets [[...]] values to {{key}} placeholders in the first YAML block below the cursor.",
+      "type": "button",
+      "code": "const text = helpers.getAllText();\nconst cursorPos = helpers.getCursorPosition();\nconst before = text.substring(0, cursorPos);\nconst lines = text.substring(cursorPos).split('\\n');\nlet blockStart = -1, blockEnd = -1;\nfor (let i = 0; i < lines.length; i++) {\n  if (lines[i].trim().startsWith('```yaml')) {\n    blockStart = i;\n    for (let j = i + 1; j < lines.length; j++) {\n      if (lines[j].trim().startsWith('```')) {\n        blockEnd = j;\n        break;\n      }\n    }\n    break;\n  }\n}\nif (blockStart !== -1 && blockEnd !== -1) {\n  for (let i = blockStart + 1; i < blockEnd; i++) {\n    const line = lines[i];\n    const colonIndex = line.indexOf(':');\n    if (colonIndex !== -1) {\n      const key = line.substring(0, colonIndex).trim();\n      const open = line.indexOf('[[', colonIndex);\n      const close = line.indexOf(']]', open);\n      if (open !== -1 && close !== -1) {\n        lines[i] = line.substring(0, open + 2) + '{{' + key + '}}' + line.substring(close);\n      }\n    }\n  }\n  helpers.replaceAllText(before + lines.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1771829510950,
+      "updatedAt": 1771829510950
+    },
+    {
+      "id": "d18930b5-8ce3-43f0-9b6c-9aa0bdf2c43a",
+      "name": "COPY",
+      "description": "Copies values from the first YAML block below the cursor, stripping [[ ]] brackets.",
+      "type": "button",
+      "code": "const lines = helpers.getLines();\nconst cursorPos = helpers.getCursorPosition();\nconst textBeforeCursor = helpers.getAllText().slice(0, cursorPos);\nconst cursorLine = textBeforeCursor.split('\\n').length;\nconst vals = [];\n\nlet targetStart = -1;\nlet targetEnd = -1;\nfor (let i = cursorLine; i < lines.length; i++) {\n  const trimmed = lines[i].trim();\n  if (trimmed.startsWith('```yaml')) {\n    targetStart = i;\n    for (let j = i + 1; j < lines.length; j++) {\n      if (lines[j].trim().startsWith('```')) {\n        targetEnd = j;\n        break;\n      }\n    }\n    break;\n  }\n}\n\nif (targetStart !== -1 && targetEnd !== -1) {\n  for (let i = targetStart + 1; i < targetEnd; i++) {\n    const text = lines[i];\n    const colonIndex = text.indexOf(':');\n    if (colonIndex !== -1) {\n      let v = text.substring(colonIndex + 1).trim();\n      v = v.replace(/^\\[\\[/, '').replace(/\\]\\]$/, '');\n      if (v) vals.push(v);\n    }\n  }\n  if (vals.length > 0) helpers.copyToClipboard(vals.join('\\n'));\n}",
+      "category": "WORKFLOW",
+      "enabled": true,
+      "isDefault": false,
+      "createdAt": 1773470422064,
+      "updatedAt": 1773470422064
+    }
+  ]
+}

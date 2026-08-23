@@ -35,16 +35,16 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist-windows
-          find src-tauri/target/release/bundle/nsis -name "*.exe" -exec cp {} dist-windows/ContextPad_1.10.0_x64_Setup.exe \; 2>/dev/null || true
+          find src-tauri/target/release/bundle/nsis -name "*.exe" -exec cp {} dist-windows/ContextPad_1.11.0_x64_Setup.exe \; 2>/dev/null || true
           if [ -f src-tauri/target/release/contextpad.exe ]; then
-            cp src-tauri/target/release/contextpad.exe dist-windows/ContextPad_1.10.0_x64_Portable.exe
+            cp src-tauri/target/release/contextpad.exe dist-windows/ContextPad_1.11.0_x64_Portable.exe
           fi
           ls -la dist-windows
 
       - name: Upload Windows Executables Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ContextPad_1.10.0_Windows_Executables
+          name: ContextPad_1.11.0_Windows_Executables
           path: dist-windows/*
 
       - name: Publish GitHub Release (Windows)
@@ -52,5 +52,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          RELEASE_TAG="v1.10.0-windows-$(date +'%Y%m%d-%H%M%S')"
-          gh release create "$RELEASE_TAG" dist-windows/* --title "ContextPad v1.10.0 Windows Build ($RELEASE_TAG)" --notes "Automated Windows setup installer and portable executable release." || true
+          RELEASE_TAG="v1.11.0-windows-$(date +'%Y%m%d-%H%M%S')"
+          gh release create "$RELEASE_TAG" dist-windows/* --title "ContextPad v1.11.0 Windows Build ($RELEASE_TAG)" --notes "Automated Windows setup installer and portable executable release." || true

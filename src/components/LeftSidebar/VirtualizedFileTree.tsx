@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect, memo } from 'react'
-import * as RW from 'react-window'
-const List = (RW as any).FixedSizeList
+import { FixedSizeList } from 'react-window'
 import { invoke } from '@tauri-apps/api/core'
 import { ContextMenu, ContextMenuItem } from '../shared/ContextMenu'
 import styles from './FileTreeItem.module.css'
@@ -298,7 +297,7 @@ export const VirtualizedFileTree = memo(function VirtualizedFileTree({
 
   return (
     <div ref={containerRef} style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-      <List
+      <FixedSizeList
         height={containerHeight}
         itemCount={flattenedNodes.length}
         itemSize={ITEM_HEIGHT}
@@ -306,7 +305,7 @@ export const VirtualizedFileTree = memo(function VirtualizedFileTree({
         itemData={itemData}
       >
         {Row}
-      </List>
+      </FixedSizeList>
 
       {contextMenu && (
         <ContextMenu

@@ -54,10 +54,21 @@ export async function executeAction(
     return new Promise((resolve) => {
       const messageId = crypto.randomUUID()
 
+      const cleanup = () => {
+        clearTimeout(timeout)
+        window.removeEventListener('message', messageHandler)
+        try {
+          if (iframe.parentNode) {
+            iframe.parentNode.removeChild(iframe)
+          }
+        } catch {
+          // ignore if already removed
+        }
+      }
+
       // Timeout safeguard
       const timeout = setTimeout(() => {
-        window.removeEventListener('message', messageHandler)
-        document.body.removeChild(iframe)
+        cleanup()
         resolve({ success: false, error: 'Action execution timed out' })
       }, 5000)
 
@@ -65,15 +76,13 @@ export async function executeAction(
         // Ensure message is from our sandbox
         if (event.source !== iframe.contentWindow) return
 
-        const { id, success, error, mutations } = event.data
+        const { id, success, error, mutations } = event.data || {}
         if (id !== messageId) return
 
-        clearTimeout(timeout)
-        window.removeEventListener('message', messageHandler)
-        document.body.removeChild(iframe)
+        cleanup()
 
         if (!success) {
-          resolve({ success: false, error })
+          resolve({ success: false, error: error || 'Execution error' })
           return
         }
 

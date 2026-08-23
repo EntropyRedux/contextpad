@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect, memo } from 'react'
-import * as RW from 'react-window'
-const List = (RW as any).FixedSizeList
+import { FixedSizeList } from 'react-window'
 import { OutlineItem } from '../../services/markdownParser'
 import styles from './OutlineItem.module.css'
 
@@ -193,7 +192,7 @@ export const VirtualizedOutline = memo(function VirtualizedOutline({
 
   return (
     <div ref={containerRef} style={{ flex: 1, minHeight: 0 }}>
-      <List
+      <FixedSizeList
         height={containerHeight}
         itemCount={flattenedItems.length}
         itemSize={ITEM_HEIGHT}
@@ -201,7 +200,7 @@ export const VirtualizedOutline = memo(function VirtualizedOutline({
         itemData={itemData}
       >
         {Row}
-      </List>
+      </FixedSizeList>
     </div>
   )
 })

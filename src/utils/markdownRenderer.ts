@@ -44,7 +44,7 @@ marked.use({
     name: 'actionButton',
     level: 'inline' as const,
     start(src: string) { return src.match(/\[\[action:/)?.index },
-    tokenizer(src: string) {
+    tokenizer(src: string): any {
       const rule = /^\[\[action:([a-zA-Z0-9-]+)\]\]/
       const match = rule.exec(src)
       if (match) {
@@ -55,9 +55,10 @@ marked.use({
         }
       }
     },
-    renderer(token: { id: string }) {
-      return `<button class="cm-action-button" title="Action: ${token.id}" data-action-id="${token.id}">
-        ${token.id}
+    renderer(token: any) {
+      const actionId = (token as { id?: string }).id || ''
+      return `<button class="cm-action-button" title="Action: ${actionId}" data-action-id="${actionId}">
+        ${actionId}
       </button>`
     }
   } as any],

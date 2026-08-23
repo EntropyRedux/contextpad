@@ -6,6 +6,7 @@ import {
 } from '@codemirror/autocomplete'
 import { Extension } from '@codemirror/state'
 import { syntaxTree } from '@codemirror/language'
+import type { SyntaxNode } from '@lezer/common'
 import { slashCommandCompletions } from '../extensions/slashCommands'
 import { codeBlockParamsCompletions } from '../extensions/codeBlockParams'
 
@@ -77,8 +78,8 @@ export class AutocompleteService {
     }
   }
 
-  private isInCodeContext(node: any): boolean {
-    let current = node
+  private isInCodeContext(node: SyntaxNode | null): boolean {
+    let current: SyntaxNode | null = node
     while (current) {
       if (current.name === 'FencedCode' || current.name === 'CodeBlock' || current.name === 'InlineCode') {
         return true

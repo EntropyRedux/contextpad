@@ -2,7 +2,10 @@ import { useRef, useEffect, useState } from 'react'
 import { useTabStore } from '../../store/tabStore'
 import { useShallow } from 'zustand/react/shallow'
 import { MarkdownOutline } from './MarkdownOutline'
+import { FileExplorer } from './FileExplorer'
 import styles from './LeftSidebar.module.css'
+
+export type LeftSidebarTab = 'outline' | 'explorer'
 
 export function LeftSidebar() {
   const { showLeftSidebar, toggleLeftSidebar, tabs, activeTabId } = useTabStore(
@@ -13,12 +16,21 @@ export function LeftSidebar() {
       activeTabId: state.activeTabId
     }))
   )
+  const [activeSidebarTab, setActiveSidebarTab] = useState<LeftSidebarTab>('outline')
   const [sidebarWidth, setSidebarWidth] = useState(300)
   const [isResizing, setIsResizing] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
   // Get active tab to check if it's markdown
   const activeTab = tabs.find(t => t.id === activeTabId)
+  const isMarkdown = activeTab?.language === 'markdown'
+
+  // If viewing non-markdown, automatically switch to explorer
+  useEffect(() => {
+    if (!isMarkdown && activeSidebarTab === 'outline') {
+      setActiveSidebarTab('explorer')
+    }
+  }, [isMarkdown, activeSidebarTab])
 
   // Handle resize
   useEffect(() => {
@@ -49,8 +61,7 @@ export function LeftSidebar() {
     }
   }, [isResizing])
 
-  // Only show sidebar for markdown files
-  if (!showLeftSidebar || activeTab?.language !== 'markdown') return null
+  if (!showLeftSidebar) return null
 
   return (
     <div
@@ -60,7 +71,22 @@ export function LeftSidebar() {
     >
       {/* Header */}
       <div className={styles.header}>
-        <div className={styles.title}>OUTLINE</div>
+        <div className={styles.tabHeader}>
+          {isMarkdown && (
+            <button
+              className={`${styles.tabBtn} ${activeSidebarTab === 'outline' ? styles.activeTab : ''}`}
+              onClick={() => setActiveSidebarTab('outline')}
+            >
+              OUTLINE
+            </button>
+          )}
+          <button
+            className={`${styles.tabBtn} ${activeSidebarTab === 'explorer' ? styles.activeTab : ''}`}
+            onClick={() => setActiveSidebarTab('explorer')}
+          >
+            EXPLORER
+          </button>
+        </div>
         <button
           className={styles.closeBtn}
           onClick={toggleLeftSidebar}
@@ -73,7 +99,11 @@ export function LeftSidebar() {
 
       {/* Content */}
       <div className={styles.content}>
-        <MarkdownOutline />
+        {activeSidebarTab === 'outline' && isMarkdown ? (
+          <MarkdownOutline />
+        ) : (
+          <FileExplorer />
+        )}
       </div>
 
       {/* Resize Handle */}
@@ -84,3 +114,4 @@ export function LeftSidebar() {
     </div>
   )
 }
+

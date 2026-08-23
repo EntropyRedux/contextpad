@@ -43,8 +43,9 @@ impl PreviewServer {
         let state = self.state.clone();
         
         let cors = CorsLayer::new()
-            .allow_origin("http://localhost:1420".parse::<axum::http::HeaderValue>().unwrap())
-            .allow_methods(tower_http::cors::Any);
+            .allow_origin(tower_http::cors::Any)
+            .allow_methods(tower_http::cors::Any)
+            .allow_headers(tower_http::cors::Any);
 
         let app = Router::new()
             .route("/", get(index_handler))
@@ -241,6 +242,15 @@ async fn index_handler(State(state): State<Arc<AppState>>) -> Html<String> {
             } else {
                 connect();
             }
+
+            // Handle Action button clicks in preview
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.cm-action-button');
+                if (btn) {
+                    const actionId = btn.getAttribute('data-action-id') || 'Unknown';
+                    updateStatus('Action: ' + actionId, false);
+                }
+            });
 
             // Handle page visibility changes
             document.addEventListener('visibilitychange', function() {
