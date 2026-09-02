@@ -2,6 +2,11 @@ import { create } from 'zustand'
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info'
 
+export interface NotificationAction {
+  label: string
+  handler: () => void
+}
+
 export interface Notification {
   id: string
   type: NotificationType
@@ -10,6 +15,8 @@ export interface Notification {
   timestamp: number
   autoHide?: boolean
   duration?: number // milliseconds
+  /** Optional inline action rendered by the top-level notification center. */
+  action?: NotificationAction
 }
 
 interface NotificationState {

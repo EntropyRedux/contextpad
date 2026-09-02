@@ -27,12 +27,29 @@ async fn update_preview_content(state: tauri::State<'_, Mutex<preview_server::Pr
 }
 
 #[tauri::command]
+async fn update_preview_settings(state: tauri::State<'_, Mutex<preview_server::PreviewServer>>, json: String) -> Result<(), String> {
+    let server = state.lock().await;
+    server.update_settings(json);
+    Ok(())
+}
+
+#[tauri::command]
 async fn get_pending_files(state: tauri::State<'_, Mutex<Vec<String>>>) -> Result<Vec<String>, String> {
     let mut files = state.lock().await;
     // Extract them to hand to frontend, then clear
     let to_return = files.clone();
     files.clear();
     Ok(to_return)
+}
+
+/// Set by the frontend after the user confirms closing with unsaved changes.
+/// Guards the main window against accidental data loss.
+#[tauri::command]
+fn confirm_close(window: tauri::Window) {
+    if let Some(flag) = window.try_state::<std::sync::Mutex<bool>>() {
+        *flag.lock().unwrap() = true;
+    }
+    let _ = window.close();
 }
 
 fn main() {
@@ -60,6 +77,9 @@ fn main() {
     .plugin(tauri_plugin_deep_link::init())
     .setup(|app| {
         app.manage(Mutex::new(preview_server::PreviewServer::new()));
+        // Close guard state: the main window refuses to close until the
+        // frontend confirms there are no unsaved changes.
+        app.manage(std::sync::Mutex::new(false));
 
         let args: Vec<String> = std::env::args().collect();
         let file_paths: Vec<String> = args
@@ -74,6 +94,24 @@ fn main() {
         app.manage(Mutex::new(file_paths));
 
         Ok(())
+    })
+    .on_window_event(|window, event| {
+        // Intercept main-window close requests so unsaved work can be
+        // confirmed from the frontend. The custom window-controls, OS title
+        // bar (when decorated), and Alt+F4 all route through here.
+        if window.label() == "main" {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                let allow = if let Some(flag) = window.try_state::<std::sync::Mutex<bool>>() {
+                    *flag.lock().unwrap()
+                } else {
+                    false
+                };
+                if !allow {
+                    api.prevent_close();
+                    let _ = window.emit("app-close-requested", ());
+                }
+            }
+        }
     })
     .invoke_handler(tauri::generate_handler![
       commands::window::minimize_window,
@@ -101,7 +139,9 @@ fn main() {
       start_preview_server,
       stop_preview_server,
       update_preview_content,
+      update_preview_settings,
       get_pending_files,
+      confirm_close,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -1,6 +1,6 @@
 # ContextPad
 
-[![Version](https://img.shields.io/badge/version-1.10.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-1.11.1-blue.svg)](#)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-green.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![Desktop](https://img.shields.io/badge/runtime-Tauri%20v2-24c8db.svg)](https://tauri.app/)
 [![Frontend](https://img.shields.io/badge/frontend-React%2018-61dafb.svg)](https://react.dev/)
@@ -117,6 +117,10 @@ If you are setting up on a fresh machine, run `npm run tauri:preflight` first.
 
 - `npm run dev` – start frontend dev server
 - `npm run build` – production frontend build
+- `npm run typecheck` – run TypeScript type checking (`tsc --noEmit`)
+- `npm run test:run` – run the vitest suite once
+- `npm run check` – typecheck + tests (same gate as CI)
+- `npm run version:sync` – sync the desktop app version from `package.json` into `src-tauri/tauri.conf.json`
 - `npm run tauri:dev` – run desktop app in dev mode
 - `npm run tauri:build` – desktop production build (app + bundles)
 - `npm run tauri:preflight` – validate desktop build prerequisites
@@ -133,7 +137,7 @@ Typical outputs:
 
 Current documented release target in this repository:
 
-- Version: `1.10.0`
+- Version: `1.11.1`
 
 ---
 
@@ -147,9 +151,16 @@ Current documented release target in this repository:
 
 ## Security & Reliability Notes
 
-- Action scripts execute in an isolated sandbox and communicate mutations back via message passing.
-- Action import pipeline sanitizes malformed payloads and normalizes legacy clipboard/helper calls for compatibility.
-- File operations are delegated to Tauri commands rather than unrestricted browser APIs.
+- **Live preview sanitization:** Markdown is sanitized with DOMPurify before it is rendered into the preview window; untrusted HTML in documents cannot execute scripts.
+- **Strict CSP (app shell + preview):** The shell enforces `script-src 'self'` (no `unsafe-inline` — verified at build time by `scripts/verify-csp.mjs`), while the preview server sends its own strict CSP header and serves its runner from an external `/preview.js`. Neither surface loads third-party CDN scripts; remote images are not loaded in the preview.
+- **No preview CORS:** The preview server does not allow cross-origin reads of open documents.
+- **Least-privilege preview window:** The preview webview runs with a minimal capability set (events only) and cannot reach app commands or window controls.
+- **Hardened action sandbox:** Action scripts execute in an isolated iframe with a strict CSP (`connect-src 'none'`, `img-src 'none'`), origin-pinned message validation, and no network exfiltration channels. Mutations are applied by the parent editor via message passing.
+- **Typed IPC:** Preview settings sync uses a typed Tauri command instead of `eval`.
+- **Action import pipeline** sanitizes malformed payloads and normalizes legacy clipboard/helper calls for compatibility.
+- **File operations** are delegated to Tauri commands rather than unrestricted browser APIs.
+- **Data-loss protection:** Content edits are flushed on window close/hide, unsaved-change close attempts require confirmation, and per-region error boundaries keep a component crash from taking down the app.
+- **CI quality gate:** Type check, tests, and `cargo check` run on every push/PR; releases are built from `v*` tags with versions derived from `package.json`.
 
 ---
 

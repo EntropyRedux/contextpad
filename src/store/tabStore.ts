@@ -189,9 +189,12 @@ const defaultViewSettings: ViewSettings = {
 
 // Content save timers for debouncing
 const contentSaveTimers = new Map<string, number>()
+const pendingContent = new Map<string, string>()
+const contentFallbackKey = 'contextpad-content-fallback'
 
 // Debounced save for tab content (2 seconds)
 const saveTabContentDebounced = (tabId: string, content: string) => {
+  pendingContent.set(tabId, content)
   const existingTimer = contentSaveTimers.get(tabId)
   if (existingTimer) {
     clearTimeout(existingTimer)
@@ -199,7 +202,9 @@ const saveTabContentDebounced = (tabId: string, content: string) => {
 
   const timer = window.setTimeout(async () => {
     try {
-      await indexedDBStorage.saveTabContent(tabId, content)
+      const contentToSave = pendingContent.get(tabId) ?? content
+      await indexedDBStorage.saveTabContent(tabId, contentToSave)
+      pendingContent.delete(tabId)
       contentSaveTimers.delete(tabId)
     } catch (error) {
       console.error(`Failed to save content for tab ${tabId}:`, error)
@@ -207,6 +212,33 @@ const saveTabContentDebounced = (tabId: string, content: string) => {
   }, 2000) // 2 second debounce
 
   contentSaveTimers.set(tabId, timer)
+}
+
+/**
+ * Flush all pending tab content immediately. Called on unload and when the
+ * window is hidden so the last few seconds of typing are never lost to the
+ * debounce. IndexedDB writes are fire-and-forget (async), so in addition we
+ * mirror the content synchronously to localStorage as a last-resort fallback.
+ */
+const flushPendingContent = (): void => {
+  for (const timer of contentSaveTimers.values()) {
+    clearTimeout(timer)
+  }
+  contentSaveTimers.clear()
+
+  if (pendingContent.size === 0) return
+
+  try {
+    const fallback: Record<string, string> = JSON.parse(localStorage.getItem(contentFallbackKey) || '{}')
+    for (const [tabId, content] of pendingContent) {
+      fallback[tabId] = content
+      void indexedDBStorage.saveTabContent(tabId, content)
+    }
+    localStorage.setItem(contentFallbackKey, JSON.stringify(fallback))
+  } catch (error) {
+    console.error('Failed to flush pending content:', error)
+  }
+  pendingContent.clear()
 }
 
 // Serialize state to a JSON string for localStorage
@@ -257,7 +289,16 @@ const saveMetadataToLocalStorage = (state: TabState) => {
 
 // Ensure metadata is flushed before the window closes
 if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', flushMetadata)
+  window.addEventListener('beforeunload', () => {
+    flushMetadata()
+    flushPendingContent()
+  })
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      flushMetadata()
+      flushPendingContent()
+    }
+  })
 }
 
 // Load metadata from localStorage
@@ -347,13 +388,22 @@ export const useTabStore = create<TabState>((set, get) => ({
     if (state.isInitialized) return
 
     try {
-      // Load content for each tab from IndexedDB
+      // Load content for each tab from IndexedDB, falling back to the
+      // synchronous localStorage mirror for anything that was still pending
+      // when the previous session ended.
+      let localFallback: Record<string, string> = {}
+      try {
+        localFallback = JSON.parse(localStorage.getItem(contentFallbackKey) || '{}')
+      } catch {
+        localFallback = {}
+      }
+
       const tabsWithContent = await Promise.all(
         state.tabs.map(async (tab) => {
           const content = await indexedDBStorage.getTabContent(tab.id)
           return {
             ...tab,
-            content: content || tab.content || ''
+            content: content || localFallback[tab.id] || tab.content || ''
           }
         })
       )
@@ -433,6 +483,7 @@ export const useTabStore = create<TabState>((set, get) => ({
       clearTimeout(timer)
       contentSaveTimers.delete(id)
     }
+    pendingContent.delete(id)
 
     // Delete from IndexedDB
     indexedDBStorage.deleteTab(id).catch(err => {

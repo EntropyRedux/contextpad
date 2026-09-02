@@ -135,7 +135,7 @@ export function MenuBar() {
         ? (viewSettings.theme.includes('light') ? 'light' : 'dark')
         : viewSettings.previewTheme as 'light' | 'dark'
 
-      const fullHtml = generateHTML(htmlContent, activeTab.title, viewSettings, tocHtml, resolvedTheme)
+      const fullHtml = generateHTML(htmlContent, activeTab.title, viewSettings, tocHtml, resolvedTheme, true)
       const defaultName = `${activeTab.title.replace(/\.[^/.]+$/, "")}.html`
 
       const filePath = await invoke<string | null>('save_file_dialog', { defaultName })

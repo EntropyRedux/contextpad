@@ -192,7 +192,7 @@ export function usePreviewSync() {
 
   // Sync Settings in real-time (Fast path)
   useEffect(() => {
-    if (showLivePreview && previewWindowRef.current) {
+    if (showLivePreview) {
       const settingsData = {
         previewFontScale: settings.previewFontScale,
         previewMaxWidth: settings.previewMaxWidth,
@@ -200,10 +200,11 @@ export function usePreviewSync() {
         previewCustomCSS: settings.previewCustomCSS
       };
       const sJson = JSON.stringify(settingsData);
-      
-      // Use eval for instant cross-window sync
-      (previewWindowRef.current as any).eval(`window.updatePreviewSettings(${sJson})`)
-        .catch((err: any) => console.warn('Real-time sync failed:', err));
+
+      // Typed IPC instead of an eval bridge: the server persists the settings
+      // and pushes them to every connected preview client over the WebSocket.
+      invoke('update_preview_settings', { json: sJson })
+        .catch((err: unknown) => console.warn('Real-time sync failed:', err));
     }
   }, [
     settings.previewFontScale,

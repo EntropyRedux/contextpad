@@ -1,6 +1,46 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.11.1] - 2026-09-02
+### Fixed
+- **Shell CSP hardening (secondary):** Kept the intentional `style-src 'unsafe-inline'` exception (required by CodeMirror's runtime style injection) but made it an auditable, documented exception — `scripts/verify-csp.mjs` now logs it at build time. `script-src 'self'` (no `unsafe-inline`) remains verified with zero inline scripts in the production bundle.
+- **Sandbox defense finalized:** Added a Proxy `set` trap so user action code cannot overwrite helper functions, closed the legacy `navigator.clipboard.writeText` path, and documented the remaining residual risks (self-navigation, synchronous-loop limits, `Function` reachability) directly in `public/sandbox.html`.
+- **Browser-level preview verification:** Added a jsdom runtime test that extracts the actual `PREVIEW_JS_BODY` from the Rust preview-server source and exercises it against a mocked WebSocket + real DOM. Covers late-joiner connect, content replacement, settings pushes, action-button clicks, malformed-payload tolerance, and reconnect-with-backoff.
+- **Repo hygiene:** Auto-generated Tauri schema files under `src-tauri/gen/` are no longer tracked (untracked + gitignored); internal planning/audit documents were consolidated into an ignored `docs-internal/` folder so they are not published to GitHub. Version bumped to `1.11.1`.
+
+### Added
+- Backlog tracking in `docs-internal/BACKLOG.md` for non-security-critical UX/notification/data-loss follow-ups.
+
+## [1.11.0] - 2026-09-02
+### Security
+- **Shell CSP Hardened:** The app shell's Content-Security-Policy no longer allows `script-src 'unsafe-inline'`. The theme bootstrap moved to an external `/theme-bootstrap.js`, Vite's inline module-preload polyfill is disabled, and `npm run tauri:build` now verifies the built `dist/index.html` contains zero inline scripts before packaging (`scripts/verify-csp.mjs`). Also tightened `img-src`/`font-src` (no wildcard `https:`), scoped `connect-src` to Tauri IPC + the two token-estimation APIs (dropped the `ws://127.0.0.1:*` wildcard), and added `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, and `frame-ancestors 'none'`.
+- **Live Preview Sanitization:** All markdown-to-HTML rendering is now sanitized with DOMPurify before it reaches the live preview window. Inline `<script>` tags, event handlers, and `javascript:` URLs from document content can no longer execute in a Tauri webview context.
+- **Strict Preview CSP:** The preview server (`src-tauri`) now sends a `Content-Security-Policy` header (`default-src 'none'; script-src 'self'; ...`) on every response. The preview runner moved to an external `/preview.js` endpoint, so the preview page loads no inline scripts.
+- **CDN Scripts Removed:** Live Preview no longer loads scripts from `cdn.tailwindcss.com`, `cdnjs.cloudflare.com`, or `cdn.jsdelivr.net` (supply-chain and privacy exposure). Syntax highlighting / Mermaid / MathJax CDN loading was removed; the runner now ships only local, no-op extension hooks.
+- **Preview CORS Removed:** The preview server no longer sends `Access-Control-Allow-Origin: *`. A webpage visited in a browser can no longer read the open document from the preview endpoint.
+- **Preview Capabilities Restricted:** The `preview` webview now has its own minimal capability file (`core:event:default`) instead of inheriting window/webview/deep-link permissions from the main window.
+- **Sandbox Hardening:** Action scripts still run in a sandboxed iframe, but the sandbox now (a) pins the parent origin via a query parameter and validates `origin` + `source` + message id on every message, (b) captures `Function`/`setTimeout` before user code runs, (c) runs under a strict CSP with `connect-src 'none'` and `img-src 'none'`, (d) neutralizes `navigator.sendBeacon` and `window.open`, and (e) exposes a read-only helper surface. The executor no longer posts with wildcard `'*'` origins. Residual risks are documented in `public/sandbox.html`.
+- **Typed Preview Settings Sync:** Replaced the unsafe `(webview as any).eval(...)` settings bridge with a typed Tauri command (`update_preview_settings`) that persists and broadcasts settings over the preview WebSocket.
+
+### Added
+- **Quality CI Gate:** New `quality.yml` workflow runs `npm run typecheck`, `npm run test:run`, and `cargo check` on every push and pull request.
+- **Type Checking:** Added `npm run typecheck` (tsc --noEmit), `npm run check` (typecheck + tests), and `npm run version:sync` scripts. Fixed all outstanding TypeScript errors (`slashCommands.ts` duplicate interface, `lockedEditor.ts` narrowing) — the codebase now type-checks cleanly.
+- **Data-Loss Protection:** Debounced content saves are now flushed to IndexedDB on `beforeunload` and when the window is hidden, with a synchronous localStorage fallback and fallback recovery on the next launch.
+- **Dirty Close Guard:** Closing the main window (custom controls, OS close, Alt+F4) is intercepted when tabs have unsaved changes and requires confirmation before the app exits.
+- **Top-Level Notification Center:** Notifications render as toasts independent of the status bar (visible even when the status bar is hidden), with a dismiss button and optional inline actions.
+- **Actionable External-Change Notifications:** "File changed externally" now offers a working **Reload** button that reloads the file from disk instead of a dead "click to reload" hint.
+- **Per-Region Error Boundaries:** Title bar, menu bar, breadcrumb, file explorer, editor, side panel, and status bar are individually wrapped so a crash in one region no longer blanks the whole app. "Try Again" remounts the failing subtree.
+- **Improved Global Error Handling:** Unhandled promise rejections are prevented from double-logging, categorized by error type, and `ChunkLoadError` auto-reload is capped at one attempt.
+- **Sandbox Protocol Tests:** New vitest coverage for sandbox message origin/source/id rejection and related protocol helpers.
+
+### Changed
+- **Preview Runner Architecture:** Live preview content and settings are delivered as structured WebSocket messages (`{"type":"content"|"settings"}`); the runner reconnects with backoff and re-initializes TOC scroll spy after content updates.
+- **HTML Export:** Exported documents embed a self-contained inline runner (TOC toggle + scroll spy) so they remain fully interactive when opened from disk without the preview server.
+- **Release Workflows:** Packaging is gated on `v*` tags (instead of every push to main), artifact names and release tags are derived from `package.json` via `npm run version:sync`, and the `|| true` failure suppression was removed from release publishing.
+
+### Fixed
+- **Preview Server Resilience:** Server errors no longer panic silently in a spawned task; they are logged and the server state is preserved.
+
 ## [1.10.0] - 2026-03-14
 ### Added
 - **Monokai Syntax Theme:** Added a first-party Monokai editor theme in the syntax theme registry.

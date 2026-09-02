@@ -1,4 +1,5 @@
 import { marked, Tokens } from 'marked'
+import DOMPurify from 'dompurify'
 
 // Helper for consistent IDs
 export const slugify = (text: any) => {
@@ -68,5 +69,13 @@ marked.use({
 })
 
 export const renderMarkdown = async (content: string): Promise<string> => {
-  return marked.parse(content) as string
+  const rawHtml = await marked.parse(content) as string
+
+  // Sanitize everything that came out of the markdown source before it can
+  // reach the live preview. Marked passes raw HTML through, so any inline
+  // <script>, event handler, or javascript: URL in untrusted markdown would
+  // otherwise execute in a Tauri webview context.
+  return DOMPurify.sanitize(rawHtml, {
+    USE_PROFILES: { html: true }
+  })
 }

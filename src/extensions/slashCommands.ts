@@ -65,10 +65,6 @@ const renderItem = (completion: Completion, _state: any, type: 'CMD' | 'BTN' | '
   return dom
 }
 
-interface SlashCompletion extends Completion {
-  typeLabel?: 'CMD' | 'BTN' | 'TMPL'
-}
-
 /**
  * Build completions from actions and templates
  */

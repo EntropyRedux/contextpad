@@ -9,6 +9,9 @@ import { useNotificationStore } from '../store/notificationStore'
  * OPTIMIZED: Uses window focus events instead of polling.
  * Only checks the active tab when the user switches back to the app,
  * which eliminates continuous background IPC calls entirely.
+ *
+ * The "changed externally" notification now carries an actionable Reload
+ * button instead of a dead "click to reload" hint.
  */
 export function useFileWatcher() {
   const tabs = useTabStore(state => state.tabs)
@@ -18,6 +21,7 @@ export function useFileWatcher() {
 
   const isCheckingRef = useRef(false)
   const lastCheckedRef = useRef<Map<string, number>>(new Map())
+  const pendingReloadRef = useRef<Map<string, number>>(new Map())
 
   const activeTab = tabs.find(t => t.id === activeTabId)
 
@@ -46,13 +50,43 @@ export function useFileWatcher() {
       }
 
       if (currentModTime > activeTab.lastModifiedTime) {
+        // Only surface one notification per detected change; do not consume
+        // the modification time until the user actually reloads (or saves).
+        const lastNotified = pendingReloadRef.current.get(tabId)
+        if (lastNotified === currentModTime) return
+        pendingReloadRef.current.set(tabId, currentModTime)
+
         addNotification({
           type: 'warning',
           message: `File "${activeTab.title}" changed externally`,
-          details: 'The file was modified outside the editor. Click to reload.',
-          duration: 10000
+          details: 'The file was modified outside the editor.',
+          duration: 12000,
+          action: {
+            label: 'Reload',
+            handler: async () => {
+              try {
+                const content = await invoke<string>('read_file', { path: filePath })
+                updateTab(tabId, {
+                  content,
+                  lastModifiedTime: currentModTime,
+                  isDirty: false
+                })
+                pendingReloadRef.current.delete(tabId)
+                addNotification({
+                  type: 'success',
+                  message: `Reloaded "${activeTab.title}" from disk`
+                })
+              } catch (reloadError) {
+                console.error(`Failed to reload ${filePath}:`, reloadError)
+                addNotification({
+                  type: 'error',
+                  message: 'Failed to reload file',
+                  details: String(reloadError)
+                })
+              }
+            }
+          }
         })
-        updateTab(tabId, { lastModifiedTime: currentModTime })
       }
     } catch (error) {
       console.warn(`Error checking file ${filePath}:`, error)

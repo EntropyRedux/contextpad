@@ -9,6 +9,7 @@ import type { EditorView } from '@codemirror/view'
 import { detectCodeBlocks } from './codeBlockDetection'
 import { getParamAsString } from './codeBlockParams'
 import { isInternalFilterBypass } from '../extensions/lockedEditor'
+import { buildSandboxUrl, getSandboxOrigin, isTrustedMessage, matchesRequestId } from './sandboxProtocol'
 
 export interface ExecutionResult {
   success: boolean
@@ -44,10 +45,14 @@ export async function executeAction(
       lineCount: helpers.getLineCount()
     }
 
-    // Create a hidden sandbox iframe
+    // Create a hidden sandbox iframe. The expected origin is pinned by the
+    // sandbox via a query parameter, and every message must match both the
+    // origin and the request id before it is trusted.
+    const sandboxOrigin = getSandboxOrigin()
+
     const iframe = document.createElement('iframe')
     iframe.style.display = 'none'
-    iframe.src = '/sandbox.html'
+    iframe.src = buildSandboxUrl(sandboxOrigin)
     iframe.sandbox.add('allow-scripts')
     document.body.appendChild(iframe)
 
@@ -73,11 +78,12 @@ export async function executeAction(
       }, 5000)
 
       const messageHandler = async (event: MessageEvent) => {
-        // Ensure message is from our sandbox
-        if (event.source !== iframe.contentWindow) return
+        // Reject any message that does not come from our sandbox origin and
+        // from the sandbox's content window (no wildcard origins).
+        if (!isTrustedMessage(event, sandboxOrigin, iframe.contentWindow)) return
 
         const { id, success, error, mutations } = event.data || {}
-        if (id !== messageId) return
+        if (!matchesRequestId(id, messageId)) return
 
         cleanup()
 
@@ -132,7 +138,7 @@ export async function executeAction(
           id: messageId,
           code,
           context
-        }, '*')
+        }, sandboxOrigin)
       }
     })
 

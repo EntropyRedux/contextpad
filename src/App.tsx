@@ -16,6 +16,9 @@ import { useFileDrop } from './hooks/useFileDrop'
 import { useStartupFiles } from './hooks/useStartupFiles'
 import { usePreviewSync } from './hooks/usePreviewSync'
 import { GlobalErrorHandler } from './components/GlobalErrorHandler'
+import { NotificationCenter } from './components/Notifications/NotificationCenter'
+import { useCloseGuard } from './hooks/useCloseGuard'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import styles from './App.module.css'
 
 function getFontStack(fontFamily: string): string {
@@ -74,6 +77,9 @@ export default function App() {
   // Enable HTML Live Preview sync
   usePreviewSync()
 
+  // Guard against closing the window with unsaved changes
+  useCloseGuard()
+
   // Initialize storage on mount
   useEffect(() => {
     const init = async () => {
@@ -102,9 +108,16 @@ export default function App() {
   return (
     <Layout>
       <GlobalErrorHandler />
-      <TitleBar />
-      <MenuBar />
-      <Breadcrumb />
+      <NotificationCenter />
+      <ErrorBoundary name="TitleBar">
+        <TitleBar />
+      </ErrorBoundary>
+      <ErrorBoundary name="MenuBar">
+        <MenuBar />
+      </ErrorBoundary>
+      <ErrorBoundary name="Breadcrumb">
+        <Breadcrumb />
+      </ErrorBoundary>
       {!isReady ? (
         <div className={styles.mainContent} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className={styles.loadingContainer}>
@@ -114,12 +127,22 @@ export default function App() {
         </div>
       ) : (
         <div className={styles.mainContent}>
-          <LeftSidebar />
-          <EditorContainer />
-          <Sidebar />
+          <ErrorBoundary name="File Explorer">
+            <LeftSidebar />
+          </ErrorBoundary>
+          <ErrorBoundary name="Editor">
+            <EditorContainer />
+          </ErrorBoundary>
+          <ErrorBoundary name="Side Panel">
+            <Sidebar />
+          </ErrorBoundary>
         </div>
       )}
-      {showStatusBar && <StatusBar />}
+      {showStatusBar && (
+        <ErrorBoundary name="Status Bar">
+          <StatusBar />
+        </ErrorBoundary>
+      )}
     </Layout>
   )
 }

@@ -13,3 +13,13 @@ Thumbs.db
 dist-windows
 release-builds/
 contextpad_AI Studio/
+
+# Docs-internal (not for GitHub)
+/docs-internal/
+
+# Auto-generated Tauri schema files (regenerated at build time by build.rs)
+/src-tauri/gen/
+
+# Stray root icon artifact
+/cntxt.ico
+

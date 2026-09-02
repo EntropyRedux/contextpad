@@ -38,6 +38,12 @@ On launch, ContextPad restores your workspace state and opens startup files when
 - **Right Sidebar:** Settings / Templates / Actions / Workflows
 - **Bottom:** Status bar (cursor, char count, tokens, language, encoding)
 
+### Notifications
+
+Errors, warnings, and info messages appear as toast cards in the top-right corner of the window — they are shown even when the status bar is hidden. Each toast can be dismissed with `×` and may include an inline action button (for example **Reload** when a file changed on disk, or retry hints after an error).
+
+If a UI region (editor, file explorer, side panel, …) ever crashes, only that region shows a recovery panel with **Try Again** / **Reload App** — the rest of the app keeps working.
+
 ---
 
 ## 2) Files, Tabs, and Workspace
@@ -55,6 +61,11 @@ On launch, ContextPad restores your workspace state and opens startup files when
 - Reorder tabs by drag/drop
 - Close dirty tabs with confirmation
 - Jump between tabs via shortcuts (see Shortcuts section)
+
+### Unsaved-changes protection
+
+- Edits are saved to a local recovery store continuously (and flushed the moment you hide or close the window), so a crash or forced close loses at most a second or two of typing.
+- If any tab has unsaved changes when you close the app, ContextPad asks for confirmation before exiting.
 
 ---
 
@@ -283,10 +294,21 @@ Workflow Manager stores quick-launch items:
 
 - Start/Stop from File menu
 - Preview settings available in Settings → Preview & Export
+- Content and preview settings are pushed to the preview window in real time over a secure local WebSocket
+
+### Preview security
+
+The preview window is deliberately locked down:
+
+- Document HTML is **sanitized** before rendering — scripts, inline event handlers, and `javascript:` links from document content never execute
+- The preview runs under a strict Content-Security-Policy and loads **no third-party scripts** (no CDNs)
+- Remote images are not loaded in the preview
+- The preview window cannot invoke app commands (file access, settings, etc.)
+- Because of this, documents using Mermaid diagrams or MathJax formulas render as plain code blocks in the preview
 
 ### Export options
 
-- Export HTML document
+- Export HTML document — the exported file is self-contained and interactive (TOC toggle + scroll spy work when opened from disk)
 - Export Blueprint JSON
 
 ### Preview customization
@@ -297,6 +319,10 @@ Workflow Manager stores quick-launch items:
 - Content margin
 - Optional TOC display
 - Custom CSS block
+
+### External file changes
+
+If a file you have open is modified by another program while ContextPad is focused, a warning toast appears with a **Reload** button. Clicking Reload loads the latest content from disk (this discards your in-editor changes for that file). Dismissing the toast keeps your current content.
 
 ---
 
@@ -388,7 +414,23 @@ Toggle syntax checks for:
 
 ## 11) Troubleshooting
 
-### Action import issues
+### A region of the app shows an error panel
+
+Only the affected region (editor, file explorer, status bar, …) failed. Click **Try Again** to remount it; if the problem persists, use **Reload App** for a full restart. Your work is preserved in the local recovery store.
+
+### External file change notifications
+
+- A toast appears when a file open in the editor changes on disk.
+- **Reload** loads the disk version and discards your in-editor changes for that file.
+- Dismissing the toast keeps your version; the notification will re-appear on the next focus check if the file still differs.
+
+### Action sandbox restrictions
+
+Action scripts run in a locked-down iframe:
+
+- No network access (`fetch`, `XMLHttpRequest`, `WebSocket` are blocked), no `sendBeacon`, no `window.open`
+- Use the `helpers` API (`getSelection`, `replaceSelection`, `insertAtCursor`, `copyToClipboard`, …) instead of globals
+- Execution is time-boxed (5 s) and results are validated by origin and message id
 
 If an imported action fails:
 
@@ -411,6 +453,10 @@ Run preflight:
 - `npm run tauri:preflight`
 
 This validates Rust/Tauri toolchain readiness before packaging.
+
+### Code quality checks
+
+Before committing, run `npm run check` (typecheck + tests) — the same gate the CI quality workflow runs on every push.
 
 ---
 

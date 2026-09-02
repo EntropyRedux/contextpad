@@ -1,9 +1,8 @@
-name: Build Linux Release
+﻿name: Build Linux Release
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -34,18 +33,26 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm install
 
+      - name: Sync Version from package.json
+        run: npm run version:sync
+
       - name: Build Tauri Package
         run: npx tauri build
+
+      - name: Get Version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Upload Linux .deb Package Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ContextPad_1.11.0_amd64
+          name: ContextPad_${{ steps.version.outputs.version }}_amd64
           path: src-tauri/target/release/bundle/deb/*.deb
 
       - name: Publish GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_TAG="v1.11.0-linux-$(date +'%Y%m%d-%H%M%S')"
-          gh release create "$RELEASE_TAG" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v1.11.0 Linux Release ($RELEASE_TAG)" --notes "Automated Linux .deb installer package release." || true
+          VERSION="${{ steps.version.outputs.version }}"
+          RELEASE_TAG="v${VERSION}-linux-$(date +'%Y%m%d-%H%M%S')"
+          gh release create "$RELEASE_TAG" src-tauri/target/release/bundle/deb/*.deb --title "ContextPad v${VERSION} Linux Release ($RELEASE_TAG)" --notes "Automated Linux .deb installer package release."

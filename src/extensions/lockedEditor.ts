@@ -222,6 +222,40 @@ function scanFieldDefaults(state: EditorState, currentDefaults: Map<string, stri
 // Transaction Filter
 // =============================================================================
 
+/**
+ * Returns true when the edit [fromA, toA) must be blocked by a locked range.
+ * Reads captured state only through booleans so TypeScript control-flow
+ * analysis never collapses closure-assigned values to `never`.
+ */
+function isEditBlockedByLockedRange(
+  ranges: { locked: RangeSet<LockedRangeValue>; allowed: RangeSet<AllowedRangeValue> },
+  fromA: number,
+  toA: number
+): boolean {
+  let isLocked = false
+  let hasExclusions = false
+
+  ranges.locked.between(fromA, toA, (_from, _to, value) => {
+    if (value instanceof LockedRangeValue) {
+      isLocked = true
+      hasExclusions = value.exclusions.length > 0
+    }
+    return false
+  })
+
+  if (!isLocked) return false
+  if (!hasExclusions) return true
+
+  let isAllowed = false
+  ranges.allowed.between(fromA, toA, (allowFrom, allowTo) => {
+    if (fromA >= allowFrom && toA <= allowTo) {
+      isAllowed = true
+    }
+  })
+
+  return !isAllowed
+}
+
 const lockedBlockFilter = EditorState.transactionFilter.of((tr) => {
   if (!tr.docChanged || tr.annotation(isInternalFilterBypass)) return tr
 
@@ -232,29 +266,9 @@ const lockedBlockFilter = EditorState.transactionFilter.of((tr) => {
 
   tr.changes.iterChanges((fromA, toA) => {
     if (blocked) return
-
-    let isLocked = false
-    let currentLockedRange: { from: number, to: number, value: LockedRangeValue } | null = null
-
-    ranges.locked.between(fromA, toA, (from, to, value) => {
-      isLocked = true
-      currentLockedRange = { from, to, value: value as LockedRangeValue }
-      return false 
-    })
-
-    if (!isLocked) return 
-
-    if (currentLockedRange && currentLockedRange.value.exclusions.length > 0) {
-      let isAllowed = false
-      ranges.allowed.between(fromA, toA, (allowFrom, allowTo) => {
-        if (fromA >= allowFrom && toA <= allowTo) {
-          isAllowed = true
-        }
-      })
-      if (isAllowed) return 
+    if (isEditBlockedByLockedRange(ranges, fromA, toA)) {
+      blocked = true
     }
-
-    blocked = true
   })
 
   return blocked ? [] : tr

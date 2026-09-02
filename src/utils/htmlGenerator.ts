@@ -1,6 +1,20 @@
-import { ViewSettings } from '../store/tabStore'
+﻿import { ViewSettings } from '../store/tabStore'
 import { slugify } from './markdownRenderer'
 import { GFM_STYLES } from './gfmStyles'
+import { STANDALONE_PREVIEW_SCRIPT } from './previewEmbed'
+
+/**
+ * Escape user-supplied text before it is interpolated into HTML. The preview
+ * document is served with a strict CSP, but title/TOC values must still be
+ * escape-encoded so they can never be reinterpreted as markup.
+ */
+export const escapeHtml = (value: string): string =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 
 export function generateTOC(content: string): string {
   const lines = content.replace(/\r\n/g, '\n').split('\n');
@@ -30,7 +44,7 @@ export function generateTOC(content: string): string {
            stack.push(level);
         }
       }
-      toc += `<li><a href="#${id}">${text}</a></li>`;
+      toc += `<li><a href="#${id}">${escapeHtml(text)}</a></li>`;
     }
   });
 
@@ -49,7 +63,8 @@ export function generateHTML(
   title: string = 'ContextPad Document',
   settings?: Partial<ViewSettings>,
   tocHtml: string = '',
-  resolvedTheme: 'light' | 'dark' = 'dark'
+  resolvedTheme: 'light' | 'dark' = 'dark',
+  embedRunner: boolean = false
 ): string {
   const maxWidth = settings?.previewMaxWidth || '100%'
   const fontScale = settings?.previewFontScale || 1.0
@@ -74,57 +89,6 @@ export function generateHTML(
     --scrollbar-track: ${token('--bg-base') || '#1e1e1e'};
     --scrollbar-thumb: ${token('--scrollbar-thumb') || '#424242'};
     --sidebar-width: 280px;
-  `
-
-  const libraryLoaderScript = `
-    <script>
-      window.PreviewLibs = {
-        hljs: false,
-        mathjax: false,
-        mermaid: false,
-        tailwind: false,
-        loaded: [],
-        errors: [],
-
-        highlight: function() {
-          if (this.hljs && window.hljs) {
-            try {
-              document.querySelectorAll('pre code:not(.hljs)').forEach(block => {
-                hljs.highlightElement(block);
-              });
-            } catch (e) { console.warn('Hljs error:', e); }
-          }
-        },
-
-        renderMermaid: async function(retries = 2) {
-          if (this.mermaid && window.mermaid) {
-            try {
-              document.querySelectorAll('.mermaid[data-processed="true"]').forEach(el => {
-                if (el.querySelector('svg') === null || el.innerHTML.includes('Syntax error')) {
-                  el.removeAttribute('data-processed');
-                }
-              });
-              const diagrams = document.querySelectorAll('.mermaid:not([data-processed="true"])');
-              if (diagrams.length > 0) {
-                await window.mermaid.run({ nodes: Array.from(diagrams), suppressErrors: true });
-              }
-            } catch (e) {
-              console.warn('Mermaid error:', e);
-              if (retries > 0) setTimeout(() => this.renderMermaid(retries - 1), 100);
-            }
-          }
-        },
-
-        renderAll: async function(contentElement) {
-          this.highlight();
-          if (this.mathjax && window.MathJax && window.MathJax.typesetPromise) {
-            try { await window.MathJax.typesetPromise(contentElement ? [contentElement] : undefined); }
-            catch (e) { console.warn('MathJax error:', e); }
-          }
-          await this.renderMermaid();
-        }
-      };
-    </script>
   `
 
   const fallbackStyles = `
@@ -185,7 +149,7 @@ export function generateHTML(
         cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       }
       .markdown-body { padding-left: ${contentMargin}; padding-right: ${contentMargin}; }
-      
+
       ${GFM_STYLES}
 
       #layout { max-width: ${maxWidth}; }
@@ -198,82 +162,30 @@ export function generateHTML(
     <style id="contextpad-custom-css">${settings?.previewCustomCSS || ''}</style>
   `
 
-  const initScript = `
-    <script>
-      window.updatePreviewSettings = function(settings) {
-         if (!settings) return;
-         if (settings.previewFontScale) document.body.style.fontSize = (16 * settings.previewFontScale) + 'px';
-         if (settings.previewMaxWidth) {
-            const l = document.getElementById('layout');
-            if (l) l.style.maxWidth = settings.previewMaxWidth;
-         }
-         if (settings.previewContentMargin) {
-            const mb = document.querySelector('.markdown-body');
-            if (mb) { mb.style.paddingLeft = settings.previewContentMargin; mb.style.paddingRight = settings.previewContentMargin; }
-         }
-         if (settings.previewCustomCSS !== undefined) {
-            const c = document.getElementById('contextpad-custom-css');
-            if (c) c.textContent = settings.previewCustomCSS;
-         }
-      };
-
-      function initPreview() {
-        const toggleBtn = document.getElementById('toc-toggle');
-        const layout = document.getElementById('layout');
-        if (toggleBtn && layout) {
-          toggleBtn.onclick = () => {
-            layout.classList.toggle('sidebar-expanded');
-          };
-        }
-        
-        // Simple scroll spy logic
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            const id = entry.target.getAttribute('id');
-            if (entry.isIntersecting && id) {
-              document.querySelectorAll('.toc-sidebar a').forEach(a => {
-                a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-              });
-            }
-          });
-        }, { rootMargin: '-20% 0px -80% 0px' });
-
-        document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(section => {
-          if (section.id) observer.observe(section);
-        });
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPreview);
-      else initPreview();
-    </script>
-  `
+  // Live preview: the runner is served as an external file (/preview.js) so
+  // the preview document can be served under a strict CSP (script-src
+  // 'self') without inline scripts. Exported HTML cannot reach /preview.js, so
+  // it gets a self-contained inline runner instead.
+  const previewScript = embedRunner
+    ? `<script>${STANDALONE_PREVIEW_SCRIPT}</script>`
+    : '<script src="/preview.js" defer></script>'
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    ${libraryLoaderScript}
-    <script src="https://cdn.tailwindcss.com" onload="window.PreviewLibs.tailwind = true;"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${resolvedTheme === 'light' ? 'github' : 'github-dark'}.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="window.PreviewLibs.hljs = true;"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async onload="window.PreviewLibs.mathjax = true;"></script>
-    <script type="module">
-      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-      mermaid.initialize({ startOnLoad: false, theme: '${resolvedTheme === 'light' ? 'default' : 'dark'}' });
-      window.mermaid = mermaid; window.PreviewLibs.mermaid = true;
-      window.PreviewLibs.renderMermaid();
-    </script>
+    <title>${escapeHtml(title)}</title>
+    ${previewScript}
     ${fallbackStyles}
 </head>
-<body>
+<body data-theme="${resolvedTheme}">
     ${showTOC ? '<button id="toc-toggle">☰</button>' : ''}
     <div id="layout" class="layout-container">
         ${showTOC ? `<div class="toc-wrapper"><nav class="toc-sidebar">${tocHtml}</nav></div>` : ''}
         <div id="content" class="markdown-body">${content}</div>
     </div>
-    <div id="lib-status">Ready</div>
-    ${initScript}
+    <div id="lib-status">Connecting...</div>
 </body>
 </html>`;
 }
