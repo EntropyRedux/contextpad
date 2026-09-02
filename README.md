@@ -25,6 +25,13 @@ If you are setting up on a fresh machine, run `npm run tauri:preflight` first.
 - User guide: [`USERGUIDE.md`](./USERGUIDE.md)
 - Release history: [`CHANGELOG.md`](./CHANGELOG.md)
 
+## Downloads & Releases
+
+- **[Latest Releases & Packages](https://github.com/EntropyRedux/contextpad/releases)**
+- **Windows Setup Installer**: [ContextPad_1.11.0_x64_Setup.exe](https://github.com/EntropyRedux/contextpad/releases/download/v1.11.0-windows-20260901-132624/ContextPad_1.11.0_x64_Setup.exe)
+- **Windows Portable (.exe)**: [ContextPad_1.11.0_x64_Portable.exe](https://github.com/EntropyRedux/contextpad/releases/download/v1.11.0-windows-20260901-132624/ContextPad_1.11.0_x64_Portable.exe)
+- **Linux Debian Package (.deb)**: [ContextPad_1.11.1_amd64.deb](https://github.com/EntropyRedux/contextpad/releases/download/v1.11.1-linux-20260902-052546/ContextPad_1.11.1_amd64.deb)
+
 ## Screenshots
 
 > Add release screenshots and reference them here when preparing public releases.
